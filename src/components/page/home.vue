@@ -1,7 +1,7 @@
 <template>
 	<div>
-		Floating Muse   
-		<div>{{date_str}}</div>
+		<div>Floating Muse</div>
+		<!-- <div>{{date_str}}</div> -->
 		<button @click="startClick">START</button>
 	</div>
 </template>

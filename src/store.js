@@ -13,34 +13,63 @@ Vue.use(VueAxios,axios);
 const store=new Vuex.Store({
 	state:{
 		location:'',
-		weather_text:[],
 		poem:[],
 		generating:false
 	},
 	mutations:{
-		setWeatherText(state,data){
-			state.weather_text=data;
+		setWeatherText(state,set){
+			state.poem=[];
+			for(var i in set){
+				state.poem.push({
+					text:set[i]
+				});
+			}
 		},
 		setLocation(state,data){
 			state.location=data.loc;
 		},
-		setPoem(state,data){
-			state.poem=data;
+		setPoem(state,set){
+
+			for(var i in state.poem){
+				var tmp_={
+					text:state.poem[i].text,
+					poem:set[i].replace(state.poem[i].text,'')
+				};
+				state.poem.splice(i,1,tmp_);
+			}
+		},
+		setGenerating(state,set){
+			state.generating=set;			
+		},
+		clearPoem(state){
+			for(var i in state.poem){
+				var tmp_={
+					text:state.poem[i].text
+				};
+				state.poem.splice(i,1,tmp_);
+			}
 		}
-		
 	},
 	actions:{
 		generatePoem:function({commit}){
 			
-			Vue.axios.post(PoemURL,this.state.weather_text)
+			commit('setGenerating',true);
+			commit('clearPoem');
+
+			var weather_text=[];
+			for(var i in this.state.poem){
+				weather_text.push(this.state.poem[i].text);
+			}
+
+			Vue.axios.post(PoemURL,weather_text)
 			.then(res=>{
 
 				console.log('res=> ',res);
-				// var sentence=res.data.split('\n');
-				//this.poem=res.data;		
-				//this.generating=false;
-
-				commit('setPoem',res.data);
+				var poem_=res.data.split('#');
+				
+				commit('setPoem',poem_);				
+				commit('setGenerating',false);
+			
 			}).catch(error=>{
 					console.log(error);
 			});

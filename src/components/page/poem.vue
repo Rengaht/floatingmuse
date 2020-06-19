@@ -1,28 +1,31 @@
 <template>
 	<div>
 		<div>{{location}}</div>
-		<div style="white-space:pre">{{poem}}</div>
+		<div>{{date_str}}</div>
+		<div>
+			<poem-item 
+				v-for="item in poem"
+				v-bind:poem="item"
+				v-bind:key="item.text"				
+			></poem-item>
+		</div>
+
 		<button @click="rewriteClick" v-if="!generating">REWRITE</button>
 		<button @click="homeClick" v-if="!generating">HOME</button>
 	</div>
 </template>
 
 <script>
+import PoemItem from '../PoemItem.vue';
 
-import Vue from 'vue';
-import axios from 'axios';
-import VueAxios from 'vue-axios';
-Vue.use(VueAxios,axios);
-
-const PoemURL="https://muse.mmlab.com.tw/sea";
-
-export default{
-	// props:['text'],
-	data(){
+export default{		
+	data:function(){
 		return{
-			generating:false
-			// poem:'waiting...'
+			date_str:new Date().toLocaleString()
 		}
+	},
+	components:{
+		PoemItem
 	},
 	computed:{
 		location:function(){
@@ -30,33 +33,33 @@ export default{
 		},
 		poem:function(){
 			return this.$store.state.poem;			
+
+		},
+		generating:function(){
+			return this.$store.state.generating;
 		}
 	},
 	methods:{
-		generatePoem:function(){
-			this.generating=true;
-			Vue.axios.post(PoemURL,this.text).then(res=>{
-				console.log('res=> ',res);
-				// var sentence=res.data.split('\n');
-				this.poem=res.data;		
-				this.generating=false;
-			});
-		},
-		rewriteClick:function(){
-			// this.poem=this.text.join('\n');		
-			// this.generatePoem();
+		rewriteClick:function(){			
+			this.date_str=new Date().toLocaleString();
+			this.$store.dispatch('generatePoem');			
 		},
 		homeClick:function(){
 			this.$router.push({name:'home'});
 		}		
 	},
 	created:function(){
-		if(this.poem===undefined || this.poem.length<1){
+
+
+		if(!this.$store.state.generating){
 			this.$router.push({name:'home'});
 			return;
 		}
 		// this.poem=this.text.join('\n');
 		//this.generatePoem();
+	},
+	updated(){
+		console.log('poem view updated!');
 	}
 }
 
