@@ -1,7 +1,7 @@
 <template>
-	<div>
-		<div>{{location}}</div>
-		<div>{{date_str}}</div>
+	<div id="_poem">
+		<div class="title">{{location}}</div>
+		<div class="title">{{date_str}}</div>
 		<div>
 			<poem-item 
 				v-for="item in poem"
@@ -17,6 +17,7 @@
 
 <script>
 import PoemItem from '../PoemItem.vue';
+import gsap from 'gsap';
 
 export default{		
 	data:function(){
@@ -33,7 +34,6 @@ export default{
 		},
 		poem:function(){
 			return this.$store.state.poem;			
-
 		},
 		generating:function(){
 			return this.$store.state.generating;
@@ -60,7 +60,24 @@ export default{
 	},
 	updated(){
 		console.log('poem view updated!');
+		gsap.from('.PoemItem',{
+			opacity:0,
+			stagger:0.1
+		});
 	}
 }
 
 </script>
+
+<style lang="scss">
+@import "../../assets/style/global_var.scss";
+
+#_poem{
+	.title{
+		color:$poem-color;
+		font-size:$header-size;
+	}
+}
+
+
+</style>

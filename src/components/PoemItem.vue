@@ -1,7 +1,7 @@
 <template>
-	<div>
-		<span>{{poem.text}}</span>
-		<span>{{poem.poem}}</span>
+	<div class="PoemItem">
+		<span class="weather_text">{{poem.text}}</span>
+		<span class="poem_text">{{poem.poem}}</span>
 	</div>
 </template>
 
@@ -13,16 +13,19 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+@import "../assets/style/global_var.scss";
 
-span{
+div{
 	white-space: pre;
+	
+	.weather_text{
+		color:$weather-color;
+	}
+	.poem_text{
+		color:$poem-color;
+	}
 }
-span:first-child{
-	color:red;
-}
-span:last-child{
-	color:black;
-}
+
 
 </style>

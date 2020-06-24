@@ -1,0 +1,103 @@
+<template>
+	<canvas id="_ocean_canvas" ref="_ocean_canvas" class="FullScreen" 
+			v-bind:width="width" 
+			v-bind:height="height"></canvas>	
+</template>
+
+
+<script type="text/javascript">
+import OceanSpot from './OceanSpot.js';
+import OceanShader from './OceanShader';
+
+export default{
+	name:'ocean-canvas',
+	data(){
+		return{
+			ctx:null,
+			tmp_ctx:null,
+			opts:{			
+				orbCount: 25,
+				baseRadius: 40,
+				addedRadius: 50,
+				baseVel: 1,
+				addedVel: 1,
+				
+				alphaThreshold: 200
+			},
+			spots:[],
+			shader:null,
+			// width:0,
+			// height:0
+		}		
+	},
+	computed:{
+		width(){return window.innerWidth;},
+		height(){return window.innerHeight;}
+		// shader(){
+		// 	return new OceanShader(this.ctx,this.width,this.height,this.opts.orbCount);
+		// }
+	},
+	mounted:function(){
+		// this.tmp_ctx=document.createElement('canvas').getContext('2d');
+		// this.tmp_ctx.width=this.width;
+		// this.tmp_ctx.height=this.height;
+
+		var canvas=this.$refs['_ocean_canvas'];
+		// this.width=canvas.clientWidth;
+		// this.height=canvas.clientHeight;
+
+		this.ctx=canvas.getContext('webgl');
+		this.init();
+	},
+	methods:{
+		init:function(){
+			
+			console.log('canvas init w= '+this.width+" h= "+this.height);
+
+			for(var i=0;i<this.opts.orbCount;++i)
+				this.spots.push(new OceanSpot(this.width,this.height));
+				// this.spots.push(new OceanSpot(this.tmp_ctx,this.width,this.height,this.opts));			
+			this.shader=new OceanShader(this.ctx,this.width,this.height,this.opts.orbCount);
+			this.shader.init(this.ctx);
+
+			this.draw();			
+		},		
+		draw(){
+			
+			// console.log('draw!');
+
+			// this.tmp_ctx.clearRect(0,0,this.width,this.height);
+			// this.ctx.fillStyle='white';
+			// this.ctx.fillRect(0,0,this.width,this.height);
+
+			var i=0;
+			for(i=0;i<this.opts.orbCount;++i)
+				this.spots[i].step(this.width,this.height);
+
+			var dataToSendToGPU = new Float32Array(3 * this.opts.orbCount);
+			for (i = 0; i < this.opts.orbCount; i++) {
+				var baseIndex = 3 * i;
+				var mb = this.spots[i];
+				dataToSendToGPU[baseIndex + 0] = mb.x;
+				dataToSendToGPU[baseIndex + 1] = mb.y;
+				dataToSendToGPU[baseIndex + 2] = mb.r;
+			}
+			this.shader.step(this.ctx,dataToSendToGPU);
+			// var image=this.tmp_ctx.getImageData(0, 0, this.width, this.height),
+			// data=new Uint8Array(image.data.buffer);
+			
+			// for(i=3;i<data.length;i+= 4)
+			// 	data[i]/=data[i]<this.opts.alphaThreshold?6:1;
+
+			// this.ctx.putImageData( image, 0, 0 );
+
+			requestAnimationFrame(this.draw);
+		}
+	}
+}
+
+
+</script>
+
+<style lang="scss">	
+</style>
