@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import Home from '@/components/page/home';
 import Map from '@/components/page/map';
 import Poem from '@/components/page/poem';
-
+// import OceanCanvas from './components/OceanCanvas.vue';
 Vue.use(VueRouter);
 
 const router=new VueRouter({

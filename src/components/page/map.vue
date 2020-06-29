@@ -1,10 +1,17 @@
 <template>
 <div>
-      <ocean-item
+     <!--  <ocean-item
         v-for="item in ocean_list"
         v-bind:ocean="item"
         v-bind:key="item.locationName"
         v-on:click.native="writePoem(item)"
+      >
+      </ocean-item> -->
+       <ocean-item
+        v-for="item in island"
+        v-bind:ocean="item"
+        v-bind:key="item.name"
+        v-on:click.native="writePoem(item.name)"
       >
       </ocean-item>
 </div>
@@ -12,12 +19,13 @@
 
 <script>
 import Vue from 'vue';
-import OceanItem from '../OceanItem.vue';
+import OceanItem from '../ocean/OceanItem.vue';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 Vue.use(VueAxios,axios);
 
-const DataURL='https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-A0012-001?Authorization=CWB-7021ACD5-3924-4A8B-8C5F-58BF57C9F18B&downloadType=WEB&format=JSON';
+
+const CWBDataURL='https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-A0012-001?Authorization=CWB-7021ACD5-3924-4A8B-8C5F-58BF57C9F18B&downloadType=WEB&format=JSON';
 
 const ElementName={ 
   'Wx':'天氣',
@@ -30,14 +38,33 @@ const ElementName={
 export default{
 	data(){
 		return{
-			ocean_list:[]
+			ocean_list:[]			
+		}
+	},
+	computed:{
+		island(){
+			// console.log('get island!');
+			return this.$store.state.island;
 		}
 	},
 	components:{
 		OceanItem
 	},
 	methods:{
-		writePoem:function(item){
+		writePoem:function(name){
+
+			var item;
+			for(var k in this.ocean_list){
+				if(this.ocean_list[k].locationName===name){
+					item=this.ocean_list[k];
+					break;
+				}
+			}
+
+			if(!item){
+				console.log('err location: '+name);
+				return;
+			}
 			let self=this;
 			self.poem='waiting...'
 
@@ -64,11 +91,14 @@ export default{
 	},
 	created:function(){
 		let self=this;
-		Vue.axios.get(DataURL).then(response=>{
+		Vue.axios.get(CWBDataURL).then(response=>{
 			var location=response.data.cwbopendata.dataset.location;
 			self.ocean_list=location;     
-		});   
-	}
+		});   		
+	},
+	mounted(){
+		this.$parent.$refs['_ocean_canvas'].goIsland();		
+    }
 
 }
 

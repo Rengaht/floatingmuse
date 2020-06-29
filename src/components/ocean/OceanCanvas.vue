@@ -16,7 +16,7 @@ export default{
 			ctx:null,
 			tmp_ctx:null,
 			opts:{			
-				orbCount: 25,
+				orbCount: 20,
 				baseRadius: 40,
 				addedRadius: 50,
 				baseVel: 1,
@@ -62,7 +62,7 @@ export default{
 
 			this.draw();			
 		},		
-		draw(){
+		draw:function(){
 			
 			// console.log('draw!');
 
@@ -92,6 +92,27 @@ export default{
 			// this.ctx.putImageData( image, 0, 0 );
 
 			requestAnimationFrame(this.draw);
+		},
+		goIsland:function(){
+			var i;
+			for(i=0;i<this.opts.orbCount;++i){
+				this.spots[i].stage='island';
+				// console.log(i);
+				if(i<this.$store.state.island.length){
+					let pos=this.$store.getters.getIslandPosition(i);
+					console.log(pos);
+					this.spots[i].setDest(pos.x,this.height-pos.y);
+				}else{
+					this.spots[i].setDest(Math.random()*this.width,Math.random()*this.height);
+				}
+			}
+		},
+		goFloat:function(){
+			var i;
+			for(i=0;i<this.opts.orbCount;++i){
+				this.spots[i].stage='floating';
+				this.spots[i].setDest();
+			}
 		}
 	}
 }

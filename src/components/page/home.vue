@@ -1,7 +1,7 @@
 <template>
 	<div class="CenterWrapper">
 		<div id="_title" @click="startClick">
-			<img src="../../assets/img/title-04.png"/>
+			<TitleSvg/>
 			<div>從台灣沿海氣象預報<br>
 			為你寫一首詩</div>
 		</div>
@@ -11,8 +11,13 @@
 
 <script>
 // import gsap from 'gsap';
+import TitleSvg from "../../assets/img/title.svg";
 
 export default {
+	name:'PageHome',
+	components:{
+		TitleSvg
+	},
 	data(){
 		return{
 		date_str:new Date().toLocaleString()
@@ -25,6 +30,8 @@ export default {
     },
     mounted(){
 		// gsap.to('#_title',{y:100,duration:3});
+		// this.$parent.setOceanStatus('float');
+		this.$parent.$refs['_ocean_canvas'].goFloat();
     }
 }
 </script>

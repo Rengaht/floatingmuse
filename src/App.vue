@@ -1,19 +1,21 @@
 <template>
  <div id="app" class="FullScreen">   
-    <ocean-canvas></ocean-canvas>    
+    <ocean-canvas ref="_ocean_canvas"></ocean-canvas>    
     <router-view class="FullScreen"></router-view>
   </div>
 </template>
 
 <script>
 
-import OceanCanvas from './components/OceanCanvas.vue';
+import OceanCanvas from './components/ocean/OceanCanvas.vue';
 export default{
   components:{
     OceanCanvas    
+  },
+  created:function(){
+    this.$store.dispatch('fetchIslandData');
   }
 }
-
 </script>
 
 <style lang="scss">

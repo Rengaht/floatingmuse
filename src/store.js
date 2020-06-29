@@ -4,6 +4,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 
 const PoemURL="https://muse.mmlab.com.tw/sea";
+const IslandDataURL="/data/ocean_data.json";
 
 Vue.use(Vuex);
 Vue.use(VueAxios,axios);
@@ -14,7 +15,8 @@ const store=new Vuex.Store({
 	state:{
 		location:'',
 		poem:[],
-		generating:false
+		generating:false,
+		island:[]
 	},
 	mutations:{
 		setWeatherText(state,set){
@@ -48,6 +50,9 @@ const store=new Vuex.Store({
 				};
 				state.poem.splice(i,1,tmp_);
 			}
+		},
+		setIslandData(state,info){
+			state.island=info;
 		}
 	},
 	actions:{
@@ -74,6 +79,28 @@ const store=new Vuex.Store({
 					console.log(error);
 			});
 
+		},
+		fetchIslandData:function({commit}){
+			Vue.axios.get(IslandDataURL).then(res=>{
+
+				var data=[];
+				// var w=res.data.main.w;
+				var h=res.data.main.h/2;
+				for(var i in res.data.ocean){
+					let ocean=res.data.ocean[i];
+					ocean.x/=h;
+					ocean.y/=h;
+					ocean.w/=h;
+					ocean.h/=h;
+					ocean.index=i;
+					data.push(ocean);
+				}
+
+				commit('setIslandData',data);
+				console.log('load island data!');
+			}).catch(err=>{
+				console.log(err);
+			});			
 		}
 	},
 	getters:{
@@ -82,6 +109,14 @@ const store=new Vuex.Store({
 		},
 		getPoem:function(state){
 			return state.poem;
+		},
+		getIslandPosition:(state)=>(index)=>{
+			var w=window.innerWidth;
+			var h=window.innerHeight;
+			return{
+				x:(w/2+state.island[index].x*h/2),
+				y:(h/2+state.island[index].y*h/2)
+			}
 		}
 	}
 
