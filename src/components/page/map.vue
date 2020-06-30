@@ -1,17 +1,14 @@
 <template>
 <div>
-     <!--  <ocean-item
-        v-for="item in ocean_list"
-        v-bind:ocean="item"
-        v-bind:key="item.locationName"
-        v-on:click.native="writePoem(item)"
-      >
-      </ocean-item> -->
+      <div class="HintRegion" id="_map_hint">
+		<div>你今天的心情<br>
+			想看看哪一片海？</div>
+      </div>
        <ocean-item
         v-for="item in island"
         v-bind:ocean="item"
         v-bind:key="item.name"
-        v-on:click.native="writePoem(item.name)"
+        v-on:click.native="writePoem(item.index,item.name)"
       >
       </ocean-item>
 </div>
@@ -51,7 +48,7 @@ export default{
 		OceanItem
 	},
 	methods:{
-		writePoem:function(name){
+		writePoem:function(index,name){
 
 			var item;
 			for(var k in this.ocean_list){
@@ -87,6 +84,8 @@ export default{
 					text:text
 				}
 			});
+
+			this.$parent.$refs['_ocean_canvas'].goPoem(parseInt(index));
 		}
 	},
 	created:function(){
@@ -104,3 +103,10 @@ export default{
 
 
 </script>
+<style scoped lang="scss">
+@import "../../assets/style/common.scss";
+#_map_hint{
+	margin-top:$margin-size;
+}
+
+</style>

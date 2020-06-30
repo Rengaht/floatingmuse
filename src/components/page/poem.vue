@@ -1,17 +1,22 @@
 <template>
-	<div id="_poem">
-		<div class="title">{{location}}</div>
-		<div class="title">{{date_str}}</div>
-		<div>
-			<poem-item 
-				v-for="item in poem"
-				v-bind:poem="item"
-				v-bind:key="item.text"				
-			></poem-item>
+	<div>
+		<div id="_poem" class="CenterWrapper">		
+			<div class="PoemRegion">
+				<poem-item 
+					v-for="item in poem"
+					v-bind:poem="item"
+					v-bind:key="item.text"				
+				></poem-item>
+			</div>			
 		</div>
-
-		<button @click="rewriteClick" v-if="!generating">REWRITE</button>
-		<button @click="homeClick" v-if="!generating">HOME</button>
+		<div class="TitleRegion">
+			<div class="title">{{location}}</div>
+			<div class="title">{{date_str}}</div>
+		</div>	
+		<div class="ButtonRegion">
+				<div class="Button" @click="rewriteClick" v-if="!generating">再寫一首</div>
+				<div class="Button" @click="homeClick" v-if="!generating">回首頁</div>
+		</div>
 	</div>
 </template>
 
@@ -73,11 +78,36 @@ export default{
 @import "../../assets/style/global_var.scss";
 
 #_poem{
-	.title{
-		color:$poem-color;
-		font-size:$header-size;
+	margin-top:$margin-size;
+	.PoemRegion{
+		
+	}	
+}
+.TitleRegion{
+	position: absolute;
+	right:$margin-size;
+	bottom:$margin-size*2;
+	text-align: right;
+
+	color:$poem-color;
+	font-size:$poem-title-size;		
+}	
+.ButtonRegion{
+	position: absolute;
+	bottom:$margin-size;
+	left:$margin-size;
+	right:$margin-size;
+
+	.Button{
+		display:inline-block;
+		color:$button-color;
+		font-size:$hint-size;
+
+		margin-left:$margin-size;
+		margin-right:$margin-size;
 	}
 }
+
 
 
 </style>

@@ -4,7 +4,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 
 const PoemURL="https://muse.mmlab.com.tw/sea";
-const IslandDataURL="/data/ocean_data.json";
+const IslandDataURL="./data/ocean_data.json";
 
 Vue.use(Vuex);
 Vue.use(VueAxios,axios);
@@ -113,9 +113,10 @@ const store=new Vuex.Store({
 		getIslandPosition:(state)=>(index)=>{
 			var w=window.innerWidth;
 			var h=window.innerHeight;
+			var rad=h*.4;
 			return{
-				x:(w/2+state.island[index].x*h/2),
-				y:(h/2+state.island[index].y*h/2)
+				x:(w/2+state.island[index].x*rad),
+				y:(h/2+state.island[index].y*rad)
 			}
 		}
 	}

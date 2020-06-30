@@ -2,8 +2,10 @@
 	<div class="CenterWrapper">
 		<div id="_title" @click="startClick">
 			<TitleSvg/>
-			<div>從台灣沿海氣象預報<br>
-			為你寫一首詩</div>
+			<div class="HintRegion">
+				從台灣沿海氣象預報<br>
+				為你寫一首詩
+			</div>
 		</div>
 		<!-- <div>{{date_str}}</div> -->				
 	</div>
@@ -37,7 +39,6 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../assets/style/global_var.scss";
 @import "../../assets/style/common.scss";
 
 #_title{
@@ -45,11 +46,7 @@ export default {
 		max-width:45%;
 		height:auto;
 		max-height: 30%;
-	}
-	div{
-		color:white;
-		font-size: $header-size;
-	}
+	}	
 	cursor:pointer;
 }
 

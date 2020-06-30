@@ -100,10 +100,13 @@ export default{
 				// console.log(i);
 				if(i<this.$store.state.island.length){
 					let pos=this.$store.getters.getIslandPosition(i);
-					console.log(pos);
-					this.spots[i].setDest(pos.x,this.height-pos.y);
+					// console.log(pos);
+					this.spots[i].setDest(pos.x,this.height-pos.y,200,.2);
 				}else{
-					this.spots[i].setDest(Math.random()*this.width,Math.random()*this.height);
+					var ang=Math.random()*Math.PI*2;
+					var rad=(Math.random()*.4+.4);
+					this.spots[i].setDest(this.width*(.5+rad*Math.sin(ang)),
+										this.height*(.5+rad*Math.cos(ang)),200);	
 				}
 			}
 		},
@@ -111,8 +114,25 @@ export default{
 			var i;
 			for(i=0;i<this.opts.orbCount;++i){
 				this.spots[i].stage='floating';
-				this.spots[i].setDest();
+				this.spots[i].setDest(undefined,undefined,200);
 			}
+		},
+		goPoem:function(index){
+			
+			console.log('go poem!');
+
+			for(var i=0;i<this.opts.orbCount;++i){
+				this.spots[i].stage='island';
+				if(i==index || Math.random()*3<1){
+					var dest_rad=Math.min(this.width,this.height)*.5*(Math.random()*.5+.5);
+					this.spots[i].setDest(this.width/2+(Math.random()*2-1)*dest_rad,this.height/2+(Math.random()*2-1)*dest_rad,200,.8);	
+				}else{
+					var ang=Math.random()*Math.PI*2;
+					var rad=(Math.random()*.4+.5);
+					this.spots[i].setDest(this.width*(.5+rad*Math.sin(ang)),
+										this.height*(.5+rad*Math.cos(ang)),200);	
+				} 
+			}	
 		}
 	}
 }

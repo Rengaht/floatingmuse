@@ -18,12 +18,14 @@ export default {
 
 div{
 	white-space: pre;
-	
+	text-align: left;
 	.weather_text{
 		color:$weather-color;
+		font-size:$weather-size;
 	}
 	.poem_text{
 		color:$poem-color;
+		font-size:$poem-size;
 	}
 }
 
