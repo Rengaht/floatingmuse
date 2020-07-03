@@ -1,28 +1,4 @@
-function compileShader(gl,shaderSource, shaderType) {
-    var shader = gl.createShader(shaderType);
-    gl.shaderSource(shader, shaderSource);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-        throw "Shader compile failed with: " + gl.getShaderInfoLog(shader);
-    }
-
-    return shader;
-}
-function getAttribLocation(gl,program, name) {
-    var attributeLocation = gl.getAttribLocation(program, name);
-    if (attributeLocation === -1) {
-        throw 'Can not find attribute ' + name + '.';
-    }
-    return attributeLocation;
-}
-function getUniformLocation(gl,program, name) {
-    var uniformLocation = gl.getUniformLocation(program, name);
-    if (uniformLocation === -1) {
-        throw 'Can not find uniform ' + name + '.';
-    }
-    return uniformLocation;
-}
+import {compileShader,getAttribLocation,getUniformLocation} from "../util/shader_util.js";
 
 function OceanShader(gl,WIDTH,HEIGHT,NUM_METABALLS){
 
@@ -129,6 +105,7 @@ OceanShader.prototype.step=function(gl,dataToSendToGPU){
 
     gl.uniform3fv(this.metaballsHandle, dataToSendToGPU);
     gl.uniform1f(this.ttHandle, performance.now());
+    
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
 }

@@ -8,9 +8,10 @@
 <script>
 
 import OceanCanvas from './components/ocean/OceanCanvas.vue';
+
 export default{
   components:{
-    OceanCanvas    
+    OceanCanvas
   },
   created:function(){
     this.$store.dispatch('fetchIslandData');

@@ -7,6 +7,7 @@
 				為你寫一首詩
 			</div>
 		</div>
+		<WaveCanvas ref='_title_canvas'/>
 		<!-- <div>{{date_str}}</div> -->				
 	</div>
 </template>
@@ -14,26 +15,36 @@
 <script>
 // import gsap from 'gsap';
 import TitleSvg from "../../assets/img/title.svg";
+import WaveCanvas from "../ocean/WaveCanvas.vue";
 
 export default {
 	name:'PageHome',
 	components:{
-		TitleSvg
+		TitleSvg,
+		WaveCanvas
 	},
 	data(){
 		return{
-		date_str:new Date().toLocaleString()
+			date_str:new Date().toLocaleString(),
+			wavetexture:null
 		}
     },
     methods:{
 		startClick:function(){
 			this.$router.push('map');
+		},
+		update:function(){
+
+			requestAnimationFrame(this.update);
 		}
     },
     mounted(){
 		// gsap.to('#_title',{y:100,duration:3});
 		// this.$parent.setOceanStatus('float');
-		this.$parent.$refs['_ocean_canvas'].goFloat();
+		this.$parent.$refs['_ocean_canvas'].goFloat();				
+		// this.$refs._title_canvas.init();
+
+		// this.update();
     }
 }
 </script>
