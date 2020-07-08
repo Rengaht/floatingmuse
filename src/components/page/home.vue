@@ -1,26 +1,27 @@
 <template>
 	<div class="CenterWrapper">
 		<div id="_title" @click="startClick">
-			<TitleSvg/>
-			<div class="HintRegion">
+			<!-- <TitleSvg/> -->
+			<WaveCanvas id="title" img_src="img/title.png"></WaveCanvas>
+			<WaveCanvas id="hint1" img_src="img/hint-1.png"></WaveCanvas>
+			<!-- <div class="HintRegion">
 				從台灣沿海氣象預報<br>
 				為你寫一首詩
-			</div>
+			</div> -->
 		</div>
-		<WaveCanvas ref='_title_canvas'/>
 		<!-- <div>{{date_str}}</div> -->				
 	</div>
 </template>
 
 <script>
 // import gsap from 'gsap';
-import TitleSvg from "../../assets/img/title.svg";
-import WaveCanvas from "../ocean/WaveCanvas.vue";
+// import TitleSvg from "../../assets/img/title.svg";
+import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 
 export default {
 	name:'PageHome',
 	components:{
-		TitleSvg,
+		// TitleSvg,
 		WaveCanvas
 	},
 	data(){
@@ -53,11 +54,10 @@ export default {
 @import "../../assets/style/common.scss";
 
 #_title{
-	img{
-		max-width:45%;
-		height:auto;
-		max-height: 30%;
-	}	
+	// img{
+	width:45%;
+	height: 30%;
+	// }	
 	cursor:pointer;
 }
 

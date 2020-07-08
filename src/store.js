@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 
-const PoemURL="https://muse.mmlab.com.tw/sea";
+const PoemURL="https://mmlab.tw/sea";
 const IslandDataURL="./data/ocean_data.json";
 
 Vue.use(Vuex);
