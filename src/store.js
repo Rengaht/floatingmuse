@@ -16,7 +16,9 @@ const store=new Vuex.Store({
 		location:'',
 		poem:[],
 		generating:false,
-		island:[]
+		island:[],
+		screenWidth:document.documentElement.clientWidth,
+		screenHeight:document.documentElement.clientHeight
 	},
 	mutations:{
 		setWeatherText(state,set){
@@ -111,12 +113,25 @@ const store=new Vuex.Store({
 			return state.poem;
 		},
 		getIslandPosition:(state)=>(index)=>{
-			var w=window.innerWidth;
-			var h=window.innerHeight;
+			// var w=state.screenWidth;
+			var h=state.screenHeight;
+
+			var ratw=h*0.625;
+			var rad=h*.4;
+			return{
+				x:(ratw/2+state.island[index].x*rad),
+				y:(h/2+h*.1+state.island[index].y*rad)
+			}
+		},
+		getIslandPositionCanvas:(state)=>(index)=>{
+			var w=state.screenWidth;
+			var h=state.screenHeight;
+
+			// var ratw=h*0.625;
 			var rad=h*.4;
 			return{
 				x:(w/2+state.island[index].x*rad),
-				y:(h/2+state.island[index].y*rad)
+				y:(h/2+h*.1+state.island[index].y*rad)
 			}
 		}
 	}

@@ -1,7 +1,9 @@
 <template>
  <div id="app" class="FullScreen">   
     <ocean-canvas ref="_ocean_canvas"></ocean-canvas>    
-    <router-view class="FullScreen"></router-view>
+    <keep-alive>
+      <router-view class="MainScreen"></router-view>
+    </keep-alive>
   </div>
 </template>
 
@@ -21,6 +23,7 @@ export default{
 
 <style lang="scss">
 @import "./assets/style/common.scss";
+@import "./assets/style/global_var.scss";
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap');
 
 #app {

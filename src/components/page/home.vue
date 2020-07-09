@@ -1,9 +1,9 @@
 <template>
 	<div class="CenterWrapper">
-		<div id="_title" @click="startClick">
+		<div id="_title" @click="startClick"  class="CenterWrapper">
 			<!-- <TitleSvg/> -->
-			<WaveCanvas id="title" img_src="img/title.png"></WaveCanvas>
-			<WaveCanvas id="hint1" img_src="img/hint-1.png"></WaveCanvas>
+			<WaveCanvas id="title" img_src="img/title.png" :ratio="0.65"></WaveCanvas>
+			<WaveCanvas class="HintRegion" id="hint1" img_src="img/hint-1.png" :ratio="0.32"></WaveCanvas>
 			<!-- <div class="HintRegion">
 				從台灣沿海氣象預報<br>
 				為你寫一首詩
@@ -51,14 +51,11 @@ export default {
 </script>
 
 <style lang="scss">
-@import "../../assets/style/common.scss";
 
 #_title{
-	// img{
-	width:45%;
-	height: 30%;
-	// }	
+	width:100%;
 	cursor:pointer;
+	flex-direction:column;
 }
 
 </style>

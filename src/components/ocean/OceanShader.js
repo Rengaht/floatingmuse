@@ -1,6 +1,6 @@
 import {compileShader,getAttribLocation,getUniformLocation} from "../util/shader_util.js";
 
-function OceanShader(gl,WIDTH,HEIGHT,NUM_METABALLS){
+function OceanShader(gl,NUM_METABALLS){
 
     this.vertexShader = compileShader(gl,'\n\
     attribute vec2 position;\n\
@@ -17,9 +17,7 @@ function OceanShader(gl,WIDTH,HEIGHT,NUM_METABALLS){
     uniform vec3 metaballs[' + NUM_METABALLS + '];\n\
     uniform vec3 ocean_color[4];\n\
     uniform float tt;\n\
-    const float WIDTH = ' + WIDTH + '.0;\n\
-    const float HEIGHT = ' + HEIGHT + '.0;'+
-    'const vec3 BORDER_COLOR=vec3(0.02,0.22,0.48);'+
+    const vec3 BORDER_COLOR=vec3(0.02,0.22,0.48);'+
     'float rand(float n){return fract(sin(n) * 43758.5453123);}\n\
     float rand(vec2 n) { \n\
         return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);\n\

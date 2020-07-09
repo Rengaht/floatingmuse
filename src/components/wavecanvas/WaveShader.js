@@ -46,8 +46,8 @@ export const fs = `
         }
         void main() {
             // apply our texture
-            float x=map(vTextureCoord.x,0.0,1.0,-.05,1.05);
-            float y=map(vTextureCoord.y,0.0,1.0,-.05,1.05);
+            float x=map(vTextureCoord.x,0.0,1.0,-.1,1.1);
+            float y=map(vTextureCoord.y,0.0,1.0,-.1,1.1);
             if(x<0.0 || x>1.0 || y<0.0 || y>1.0){
                 gl_FragColor=vec4(0,0,0,0);
                 return;

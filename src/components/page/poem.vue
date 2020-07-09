@@ -14,13 +14,18 @@
 			<div class="title">{{date_str}}</div>
 		</div>	
 		<div class="ButtonRegion">
-				<div class="Button" @click="rewriteClick" v-if="!generating">再寫一首</div>
-				<div class="Button" @click="homeClick" v-if="!generating">回首頁</div>
+				<div class="Button" @click="rewriteClick">
+					<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
+				</div>
+				<div class="Button" @click="homeClick">
+					<WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas>
+				</div>
 		</div>
 	</div>
 </template>
 
 <script>
+import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 import PoemItem from '../PoemItem.vue';
 import gsap from 'gsap';
 
@@ -31,7 +36,8 @@ export default{
 		}
 	},
 	components:{
-		PoemItem
+		PoemItem,
+		WaveCanvas
 	},
 	computed:{
 		location:function(){
@@ -74,7 +80,7 @@ export default{
 
 </script>
 
-<style lang="scss">
+<style scoped lang="scss">
 @import "../../assets/style/global_var.scss";
 
 #_poem{
@@ -86,7 +92,7 @@ export default{
 .TitleRegion{
 	position: absolute;
 	right:$margin-size;
-	bottom:$margin-size*2;
+	bottom:$margin-size*5;
 	text-align: right;
 
 	color:$poem-color;
@@ -96,15 +102,18 @@ export default{
 	position: absolute;
 	bottom:$margin-size;
 	left:$margin-size;
-	right:$margin-size;
-
+	// right:$margin-size;
+	width:50%;
 	.Button{
 		display:inline-block;
 		color:$button-color;
 		font-size:$hint-size;
 
-		margin-left:$margin-size;
-		margin-right:$margin-size;
+		margin-left:$margin-size/2;
+		margin-right:$margin-size/2;
+
+		$all_pad:$margin-size*2;
+		width: calc((100% - #{$all_pad})/2);
 	}
 }
 

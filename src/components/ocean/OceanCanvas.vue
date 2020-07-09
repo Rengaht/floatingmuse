@@ -1,5 +1,5 @@
 <template>
-	<canvas id="_ocean_canvas" ref="_ocean_canvas" class="FullScreen" 
+	<canvas id="_ocean_canvas" ref="_ocean_canvas" 
 			v-bind:width="width" 
 			v-bind:height="height"></canvas>	
 </template>
@@ -25,23 +25,37 @@ export default{
 			},
 			spots:[],
 			shader:null,
-			// width:0,
-			// height:0
+			width:this.$store.state.screenWidth,
+			height:this.$store.state.screenHeight
 		}		
 	},
-	computed:{
-		width(){return window.innerWidth;},
-		height(){return window.innerHeight;}
-		// shader(){
-		// 	return new OceanShader(this.gl,this.width,this.height,this.opts.orbCount);
-		// }
+	watch:{
+		'$store.state.screenWidth':function(val){
+			this.width=val;
+			this.resize();
+		},
+		'$store.state.screenHeight':function(val){
+			this.height=val;
+			this.resize();
+		}
 	},
+	// computed:{
+	// 	width(){return this.$store.state.screenWidth;},
+	// 	height(){return this.$store.state.screenHeight;}
+	// // 	// shader(){
+	// // 	// 	return new OceanShader(this.gl,this.width,this.height,this.opts.orbCount);
+	// // 	// }
+	// },
 	mounted:function(){
 		// this.tmp_gl=document.createElement('canvas').getContext('2d');
 		// this.tmp_gl.width=this.width;
 		// this.tmp_gl.height=this.height;
+		this.width=this.$store.state.screenWidth;
+		this.height=this.$store.state.screenHeight;
 
 		var canvas=this.$refs['_ocean_canvas'];
+		// canvas.width=this.width;
+		// canvas.height=this.height;
 		// this.width=canvas.clientWidth;
 		// this.height=canvas.clientHeight;
 
@@ -56,7 +70,7 @@ export default{
 			for(var i=0;i<this.opts.orbCount;++i)
 				this.spots.push(new OceanSpot(this.width,this.height));
 				// this.spots.push(new OceanSpot(this.tmp_gl,this.width,this.height,this.opts));			
-			this.shader=new OceanShader(this.gl,this.width,this.height,this.opts.orbCount);
+			this.shader=new OceanShader(this.gl,this.opts.orbCount);
 			this.shader.init(this.gl);
 
 			this.draw();			
@@ -98,7 +112,7 @@ export default{
 				this.spots[i].stage='island';
 				// console.log(i);
 				if(i<this.$store.state.island.length){
-					let pos=this.$store.getters.getIslandPosition(i);
+					let pos=this.$store.getters.getIslandPositionCanvas(i);
 					// console.log(pos);
 					this.spots[i].setDest(pos.x,this.height-pos.y,200,.2);
 				}else{
@@ -132,6 +146,14 @@ export default{
 										this.height*(.5+rad*Math.cos(ang)),200);	
 				} 
 			}	
+		},
+		resize:function(){
+			this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+			this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
+			for(var i=0;i<this.opts.orbCount;++i){
+				this.spots[i].width=this.width;
+				this.spots[i].height=this.height;
+			}
 		}
 	}
 }

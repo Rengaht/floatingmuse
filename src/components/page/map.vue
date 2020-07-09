@@ -1,9 +1,10 @@
 <template>
-<div>
-      <div class="HintRegion" id="_map_hint">
+<div id="_map" class="CenterWrapper">
+      <!-- <div class="HintRegion" id="_map_hint">
 		<div>你今天的心情<br>
 			想看看哪一片海？</div>
-      </div>
+      </div> -->
+		<WaveCanvas id="hint2" img_src="img/hint-2.png" :ratio="0.3" class="HintRegion"></WaveCanvas> 
        <ocean-item
         v-for="item in island"
         v-bind:ocean="item"
@@ -15,6 +16,8 @@
 </template>
 
 <script>
+import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
+
 import Vue from 'vue';
 import OceanItem from '../ocean/OceanItem.vue';
 import axios from 'axios';
@@ -45,7 +48,8 @@ export default{
 		}
 	},
 	components:{
-		OceanItem
+		OceanItem,
+		WaveCanvas
 	},
 	methods:{
 		writePoem:function(index,name){
@@ -108,5 +112,7 @@ export default{
 #_map_hint{
 	margin-top:$margin-size;
 }
-
+#_map{
+	align-items:flex-start;
+}
 </style>
