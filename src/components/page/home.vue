@@ -33,6 +33,8 @@ export default {
     methods:{
 		startClick:function(){
 			this.$router.push('map');
+			this.$parent.$refs['_ocean_canvas'].goIsland();				
+		
 		},
 		update:function(){
 
