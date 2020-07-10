@@ -1,7 +1,9 @@
+import {TweenMax} from 'gsap';
+
 const RADIUS_PORTION=0.5;
 // const SPOT_VEL=5;
-const DEST_TOLERANCE=20;
-const MOVE_INTERVAL=200;
+// const DEST_TOLERANCE=20;
+const MOVE_INTERVAL=3000;
 const DRIFT_VEL=0.5;
 // const MAX_VEL=28.0;
 const MAX_RAD=300;
@@ -24,11 +26,7 @@ export default class OceanSpot{
 		this.destx;
 		this.desty;
 
-		this.dvx;
-		this.dvy;
-		this.cx=this.x;
-		this.cy=this.y;
-
+		this.tween;
 		this.setDest();
 
 		this.stage='floating'; // floating, island, poem
@@ -72,14 +70,16 @@ export default class OceanSpot{
 	}
 	atDest(){
 	
-		// console.log(this.cx+' '+this.cy);
-		var dx=this.cx-this.destx;
-		var dy=this.cy-this.desty;
-		var d=dx*dx+dy*dy;
+		// // console.log(this.cx+' '+this.cy);
+		// var dx=this.cx-this.destx;
+		// var dy=this.cy-this.desty;
+		// var d=dx*dx+dy*dy;
 
 
-		if(d<DEST_TOLERANCE) return true;
-		else return false;
+		// if(d<DEST_TOLERANCE) return true;
+		// else return false;
+		// console.log('check dest');
+		return !this.tween.isActive();
 	}
 	move(){
 		this.cx += this.vx;
@@ -100,27 +100,12 @@ export default class OceanSpot{
 
 	step(){
 	
-		if(!this.atDest()){
-			this.move();	
-			if(Math.abs(this.destr-this.r)>1) this.r+=this.vr;
-
-			this.x=this.cx;
-			this.y=this.cy;
-
-		}else{
-			this.x+=this.dvx;
-			this.y+=this.dvy;
-
-			if(this.x<this.cx-DEST_TOLERANCE) this.dvx=DRIFT_VEL;
-			else if(this.x>this.cx+DEST_TOLERANCE) this.dvx=-DRIFT_VEL;
-
-			if(this.y<this.cy-DEST_TOLERANCE) this.dvy=DRIFT_VEL;
-			else if(this.y>this.cy+DEST_TOLERANCE) this.dvy=-DRIFT_VEL;
-			
+		if(this.atDest()){
 			if(this.stage==="floating"){
-				if(Math.random()*2<1){
+				console.log('float');
+				// if(Math.random()*200<1){
 					this.setDest();
-				}
+				// }
 			}			
 		}
 	
@@ -149,40 +134,24 @@ export default class OceanSpot{
 		if(rad_portion===undefined) rad_portion=RADIUS_PORTION;
 
 		var rad=this.randomRadius(rad_portion);
-		// var dist=rad*(Math.random()*10+5);
 
-		// if(Math.random()*2<1) dist*=-1;
-		// if(destx===undefined) destx=this.cx+dist;
-
-		// if(Math.random()*2<1) dist*=-1;
-		// if(desty===undefined) desty=this.cy+dist;
 		if(destx===undefined) destx=Math.random()*(this.width +this.r) - this.r;
 		if(desty===undefined) desty=Math.random()*(this.height +this.r) - this.r;
 		// console.log('set dest= '+destx+" , "+desty);
 
-		// this.destx=Math.min(Math.max(destx,rad),this.width-rad);
-		// this.desty=Math.min(Math.max(desty,rad),this.height-rad);
-		this.destx=Math.min(Math.max(destx,0),this.width);
-		this.desty=Math.min(Math.max(desty,0),this.height);
-		this.destr=rad;
-
-		this.x=this.cx;
-		this.y=this.cy;
+		destx=Math.min(Math.max(destx,0),this.width);
+		desty=Math.min(Math.max(desty,0),this.height);
 		
-		var dx=this.destx-this.cx;
-		var dy=this.desty-this.cy;
-		var t=Math.random()*interval*.5+interval*.5;
-
-		this.interval=t;
-		this.vx=dx/this.interval;//Math.min(Math.abs(dx/this.interval),MAX_VEL)*(dx/Math.abs(dx));
-		this.vy=dy/this.interval;//Math.min(Math.abs(dy/this.interval),MAX_VEL)*(dy/Math.abs(dy));
-			
-		this.vr=(rad-this.r)/t;
-		
-		this.dvx=DRIFT_VEL*(Math.random()*2-1);
-		this.dvy=DRIFT_VEL*(Math.random()*2-1);
-
-		
+		if(this.tween) this.tween.kill();
+		this.tween=TweenMax.to(this,interval/1000,{
+			x:destx,
+			y:desty,
+			r:rad,
+			overwrite:'all'
+			// onComplete:function(){
+			// 	console.log('complete!');
+			// }
+		});	
 		
 	}
 	randomRadius(portion){

@@ -99,10 +99,9 @@ export default{
 			self.ocean_list=location;     
 		});   		
 	},
-	// beforeRouteEnter(to,from,next){
-	// 	next();
-	// 	this.$parent.$refs['_ocean_canvas'].goIsland();		
- //    }
+	activated:function(){
+		this.$parent.$refs['_ocean_canvas'].goIsland();		
+    }
 
 }
 

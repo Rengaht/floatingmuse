@@ -33,7 +33,7 @@ export default {
     methods:{
 		startClick:function(){
 			this.$router.push('map');
-			this.$parent.$refs['_ocean_canvas'].goIsland();				
+			// this.$parent.$refs['_ocean_canvas'].goIsland();				
 		
 		},
 		update:function(){
@@ -41,7 +41,7 @@ export default {
 			requestAnimationFrame(this.update);
 		}
     },
-    mounted(){
+    activated:function(){
 		// gsap.to('#_title',{y:100,duration:3});
 		// this.$parent.setOceanStatus('float');
 		this.$parent.$refs['_ocean_canvas'].goFloat();				

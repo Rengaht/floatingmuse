@@ -30,5 +30,6 @@ export default{
   font-family:'Noto Sans TC', sans-serif;
   text-align: center;
   // margin-top: 60px; 
+  background:$ocean-blue;
 }
 </style>
