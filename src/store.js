@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
+import {IslandPortion} from './components/ocean/OceanShader.js';
 
 const PoemURL="https://mmlab.tw/sea";
 const IslandDataURL="./data/ocean_data.json";
@@ -9,13 +10,14 @@ const IslandDataURL="./data/ocean_data.json";
 Vue.use(Vuex);
 Vue.use(VueAxios,axios);
 
-
+// export const IslandPortion=.35;
 
 const store=new Vuex.Store({
 	state:{
 		location:'',
 		poem:[],
 		generating:false,
+		ocean:[],
 		island:[],
 		screenWidth:document.documentElement.clientWidth,
 		screenHeight:document.documentElement.clientHeight
@@ -53,8 +55,11 @@ const store=new Vuex.Store({
 				state.poem.splice(i,1,tmp_);
 			}
 		},
-		setIslandData(state,info){
-			state.island=info;
+		setOceanData(state,info){
+			state.ocean=info;
+		},
+		setIslandData(state,data){
+			state.island=data;
 		}
 	},
 	actions:{
@@ -98,8 +103,21 @@ const store=new Vuex.Store({
 					data.push(ocean);
 				}
 
-				commit('setIslandData',data);
-				console.log('load island data!');
+				var island=[];
+				for(i in res.data.island){
+					let t=res.data.island[i];
+					t.x/=h;
+					t.y/=h;
+					t.w/=h;
+					t.h/=h;
+					t.index=i;
+					t.r/=h;
+					island.push(t);
+				}				
+
+				commit('setOceanData',data);
+				commit('setIslandData',island);
+				console.log('load ocean data!');
 			}).catch(err=>{
 				console.log(err);
 			});			
@@ -112,28 +130,44 @@ const store=new Vuex.Store({
 		getPoem:function(state){
 			return state.poem;
 		},
-		getIslandPosition:(state)=>(index)=>{
+		getOceanPosition:(state)=>(index)=>{
 			// var w=state.screenWidth;
 			var h=state.screenHeight;
 
 			var ratw=h*0.625;
-			var rad=h*.4;
+			var rad=h*IslandPortion;
 			return{
-				x:(ratw/2+state.island[index].x*rad),
-				y:(h/2+h*.1+state.island[index].y*rad)
+				x:(ratw/2+state.ocean[index].x*rad),
+				y:(h/2+h*.1+state.ocean[index].y*rad)
 			}
 		},
-		getIslandPositionCanvas:(state)=>(index)=>{
+		getOceanPositionCanvas:(state)=>(index)=>{
 			var w=state.screenWidth;
 			var h=state.screenHeight;
 
 			// var ratw=h*0.625;
-			var rad=h*.4;
+			var rad=h*IslandPortion;
+			return{
+				x:(w/2+state.ocean[index].x*rad),
+				y:(h/2+h*.1+state.ocean[index].y*rad)
+			}
+		},
+		getIslandPositionCanvas:(state)=>(index)=>{
+
+			if(index<0 || index>=state.island.length){
+				return {x:0,y:0,r:0};
+			}
+			var w=state.screenWidth;
+			var h=state.screenHeight;
+
+			// var ratw=h*0.625;
+			var rad=h*IslandPortion;
 			return{
 				x:(w/2+state.island[index].x*rad),
-				y:(h/2+h*.1+state.island[index].y*rad)
+				y:(h/2+h*.1+state.island[index].y*rad),
+				r:state.island[index].r,
 			}
-		}
+		},
 	}
 
 });

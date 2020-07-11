@@ -13,7 +13,7 @@ export default {
 		// console.log(this.ocean);
 		// var w=window.innerWidth;
 		// var h=window.innerHeight;
-		var pos=this.$store.getters.getIslandPosition(this.ocean.index);
+		var pos=this.$store.getters.getOceanPosition(this.ocean.index);
 		// console.log(pos);
 		return{
 			left:pos.x+'px',

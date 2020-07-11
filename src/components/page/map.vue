@@ -6,7 +6,7 @@
       </div> -->
 		<WaveCanvas id="hint2" img_src="img/hint-2.png" :ratio="0.3" class="HintRegion"></WaveCanvas> 
        <ocean-item
-        v-for="item in island"
+        v-for="item in ocean"
         v-bind:ocean="item"
         v-bind:key="item.name"
         v-on:click.native="writePoem(item.index,item.name)"
@@ -42,9 +42,9 @@ export default{
 		}
 	},
 	computed:{
-		island(){
+		ocean(){
 			// console.log('get island!');
-			return this.$store.state.island;
+			return this.$store.state.ocean;
 		}
 	},
 	components:{
@@ -93,6 +93,9 @@ export default{
 		}
 	},
 	created:function(){
+
+	
+		console.log('map created');
 		let self=this;
 		Vue.axios.get(CWBDataURL).then(response=>{
 			var location=response.data.cwbopendata.dataset.location;
@@ -100,9 +103,10 @@ export default{
 		});   		
 	},
 	activated:function(){
-		this.$parent.$refs['_ocean_canvas'].goIsland();		
-    }
 
+		this.$parent.$refs['_ocean_canvas'].goIsland();		
+    },
+  
 }
 
 

@@ -5,11 +5,11 @@
 
 <script type="text/javascript">
 import * as THREE from 'three';
-import {vs,fs,fs_t,NUM_METABALLS} from './OceanShader.js';
+import {vs,fs,fs_tw,NUM_METABALLS,NUM_METABALLS_TW,IslandPortion} from './OceanShader.js';
 import OceanSpot from './OceanSpot.js';
 import {TweenMax} from 'gsap';
 
-const TRANSITON_INTERVAL=1000;
+const TRANSITON_INTERVAL=3000;
 // import OceanShader from './OceanShader';
 
 export default{
@@ -26,6 +26,7 @@ export default{
 			spots:[],
 			material_ocean:null,
 			material_taiwan:null,
+			stage:'floating',
 		}
 	},
 	watch:{
@@ -55,8 +56,13 @@ export default{
 
 
 
-			for(var i=0;i<NUM_METABALLS;++i)
-				this.spots.push(new OceanSpot(this.width,this.height));
+			for(var i=0;i<NUM_METABALLS;++i){
+				let spot=new OceanSpot(this.width,this.height);
+				if(i<NUM_METABALLS_TW) 
+					spot.is_tw=true;
+				this.spots.push(spot);
+
+			}
 
 			this.material_ocean=new THREE.ShaderMaterial({
 				uniforms:{
@@ -109,15 +115,24 @@ export default{
 					},
 					height:{
 						value:planeHeight
-					}
+					},
+					ISLAND_COLOR:{
+						value:new Float32Array([55/256,186/256,184/256,
+												43/256,121/256,180/256,
+												19/256,160/256,182/256,
+												18/256,86/256,142/256]),
+					},
+					ISLAND_PORTION:{
+						value:IslandPortion,
+					},
 				},
 				transparent: true,
 				vertexShader:vs,
-				fragmentShader:fs_t
+				fragmentShader:fs_tw
 			});
 
 			this.mesh_ocean = new THREE.Mesh(geometry, this.material_ocean);
-			TweenMax.to(this.material_ocean.uniforms.tt,2,{value:1, yoyo:true, repeat:-1});
+			TweenMax.to(this.material_ocean.uniforms.tt,10,{value:1, yoyo:true, repeat:-1});
 
 			this.mesh_taiwan= new THREE.Mesh(geometry, this.material_taiwan);
 			
@@ -141,23 +156,62 @@ export default{
 			for(i=0;i<NUM_METABALLS;++i)
 				this.spots[i].step(this.width,this.height);
 
-			var dataToSendToGPU = new Float32Array(3 * NUM_METABALLS);
-			for (i = 0; i <NUM_METABALLS; i++) {
+			// if(this.stage==="floating"){
+			// 	let data=this.packSpots(this.spots);
+			// 	this.material_ocean.uniforms.metaballs.value=data;
+			// 	this.material_taiwan.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS_TW);
+			// 	// this.material_taiwan.uniforms.metaballs.value=data;
+			// }else if(this.stage==="island"){
+				var data_ocean=this.packSpots(this.spots.filter(p=>!p.is_tw),NUM_METABALLS);
+				var data_tw=this.packSpots(this.spots.filter(p=>p.is_tw));
+				
+				this.material_ocean.uniforms.metaballs.value=data_ocean;
+				// this.material_ocean.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS);
+				
+				this.material_taiwan.uniforms.metaballs.value=data_tw;
+			// }else{
+			// 	let data=this.packSpots(this.spots);
+			// 	this.material_ocean.uniforms.metaballs.value=data;
+			// 	this.material_taiwan.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS_TW);
+				
+			// }
+
+			// var dataToSendToGPU = new Float32Array(3 * NUM_METABALLS);
+			// for (i = 0; i <NUM_METABALLS; i++) {
+			// 	var baseIndex = 3 * i;
+			// 	var mb = this.spots[i];
+			// 	dataToSendToGPU[baseIndex + 0] = mb.x/this.width;
+			// 	dataToSendToGPU[baseIndex + 1] = mb.y/this.height;
+			// 	dataToSendToGPU[baseIndex + 2] = mb.r/Math.min(this.width,this.height);
+			// }
+			// this.material_ocean.uniforms.metaballs.value=dataToSendToGPU;
+			// this.material_ocean.uniforms.tt.value++;
+
+
+
+
+			this.renderer.render(this.scene, this.camera)
+		},
+		packSpots:function(arr,len){
+			// console.log(arr);
+			if(len==undefined) len=arr.length;
+
+			var dataToSendToGPU = new Float32Array(3 * len);
+			for(var i = 0; i <arr.length; i++){
 				var baseIndex = 3 * i;
-				var mb = this.spots[i];
+				var mb = arr[i];
 				dataToSendToGPU[baseIndex + 0] = mb.x/this.width;
 				dataToSendToGPU[baseIndex + 1] = mb.y/this.height;
 				dataToSendToGPU[baseIndex + 2] = mb.r/Math.min(this.width,this.height);
 			}
-			this.material_ocean.uniforms.metaballs.value=dataToSendToGPU;
-			// this.material_ocean.uniforms.tt.value++;
-
-			this.renderer.render(this.scene, this.camera)
+			return dataToSendToGPU;
 		},
 		resize:function(){
 			
 			this.material_ocean.uniforms.width.value=this.width;
 			this.material_ocean.uniforms.height.value=this.height;
+			this.material_taiwan.uniforms.width.value=this.width;
+			this.material_taiwan.uniforms.height.value=this.height;
 
 			this.renderer.setSize(this.width,this.height);
 			this.renderer.render(this.scene,this.camera);
@@ -169,22 +223,26 @@ export default{
 			}
 		},
 		goIsland:function(){
+
+
 			var i;
 			for(i=0;i<NUM_METABALLS;++i){
 				this.spots[i].stage='island';
 				// console.log(i);
-				if(i<this.$store.state.island.length){
-					let pos=this.$store.getters.getIslandPositionCanvas(i);
+				// if(i<this.$store.state.island.length){
+				if(!this.spots[i].is_tw){
+					var index=i-NUM_METABALLS_TW;
+					let pos=this.$store.getters.getOceanPositionCanvas(index);
 					// console.log(pos);
-					this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL,.2);
+					this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL,.25);
 				}else{
-					var ang=Math.random()*Math.PI*2;
-					var rad=(Math.random()*.4+.4);
-					this.spots[i].setDest(this.width*(.5+rad*Math.sin(ang)),
-										this.height*(.5+rad*Math.cos(ang)),TRANSITON_INTERVAL);	
+					// var rad=.4;
+					let pos=this.$store.getters.getIslandPositionCanvas(i);
+					this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL,pos.r);	
 				}
 			}
-			TweenMax.to(this.material_taiwan.uniforms.tt,2,{value:1});
+			this.stage='island';
+			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
 		},
 		goFloat:function(){
 			var i;
@@ -192,7 +250,8 @@ export default{
 				this.spots[i].stage='floating';
 				this.spots[i].setDest(undefined,undefined,TRANSITON_INTERVAL);
 			}
-			TweenMax.to(this.material_taiwan.uniforms.tt,2,{value:0});
+			this.stage='floating';
+			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
 		},
 		goPoem:function(index){
 			
@@ -210,6 +269,8 @@ export default{
 										this.height*(.5+rad*Math.cos(ang)),TRANSITON_INTERVAL);	
 				} 
 			}	
+			this.stage='poem';
+			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
 		},
 	},
 	mounted(){
