@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
 import * as THREE from 'three';
-import {vs,fs,fs_tw,NUM_METABALLS,NUM_METABALLS_TW,IslandPortion} from './OceanShader.js';
+import {vs,fs,fs_tw,NUM_METABALLS,NUM_METABALLS_TW,IslandPortion,IslandCenter} from './OceanShader.js';
 import OceanSpot from './OceanSpot.js';
 import {TweenMax} from 'gsap';
 
@@ -84,6 +84,9 @@ export default{
 					},
 					height:{
 						value:planeHeight
+					},
+					layer:{
+						value:1.0
 					}
 				},
 				transparent: true,
@@ -125,6 +128,9 @@ export default{
 					ISLAND_PORTION:{
 						value:IslandPortion,
 					},
+					ISLAND_CENTER:{
+						value:1-IslandCenter,
+					},
 				},
 				transparent: true,
 				vertexShader:vs,
@@ -161,7 +167,7 @@ export default{
 			// 	this.material_ocean.uniforms.metaballs.value=data;
 			// 	this.material_taiwan.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS_TW);
 			// 	// this.material_taiwan.uniforms.metaballs.value=data;
-			// }else if(this.stage==="island"){
+			if(this.stage==="island"){
 				var data_ocean=this.packSpots(this.spots.filter(p=>!p.is_tw),NUM_METABALLS);
 				var data_tw=this.packSpots(this.spots.filter(p=>p.is_tw));
 				
@@ -169,6 +175,12 @@ export default{
 				// this.material_ocean.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS);
 				
 				this.material_taiwan.uniforms.metaballs.value=data_tw;
+			}else{
+				let data=this.packSpots(this.spots);
+				// var data_tw=this.packSpots(this.spots.filter(p=>p.is_tw));
+				this.material_ocean.uniforms.metaballs.value=data;
+				this.material_taiwan.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS_TW);
+			}
 			// }else{
 			// 	let data=this.packSpots(this.spots);
 			// 	this.material_ocean.uniforms.metaballs.value=data;
@@ -220,6 +232,19 @@ export default{
 			for(var i=0;i<NUM_METABALLS;++i){
 				this.spots[i].width=this.width;
 				this.spots[i].height=this.height;
+
+					if(this.stage==='island'){
+						if(!this.spots[i].is_tw){
+						var index=i-NUM_METABALLS_TW;
+						let pos=this.$store.getters.getOceanPositionCanvas(index);
+						// console.log(pos);
+						this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL*.1,.25);
+					}else{
+						// var rad=.4;
+						let pos=this.$store.getters.getIslandPositionCanvas(i);
+						this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL*.1,pos.r);	
+					}
+				}
 			}
 		},
 		goIsland:function(){
@@ -243,6 +268,8 @@ export default{
 			}
 			this.stage='island';
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
+
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
 		},
 		goFloat:function(){
 			var i;
@@ -252,6 +279,7 @@ export default{
 			}
 			this.stage='floating';
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:1.0});
 		},
 		goPoem:function(index){
 			

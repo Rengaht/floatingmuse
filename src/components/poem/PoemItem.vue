@@ -14,7 +14,7 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import "../assets/style/global_var.scss";
+@import "../../assets/style/global_var.scss";
 
 div{
 	white-space: pre;

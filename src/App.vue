@@ -1,6 +1,7 @@
 <template>
  <div id="app" class="FullScreen">   
-    <ocean-canvas ref="_ocean_canvas"></ocean-canvas>    
+    <ocean-canvas ref="_ocean_canvas"></ocean-canvas>   
+    <PoemCanvas ref="_poem_canvas"></PoemCanvas> 
     <keep-alive>
       <router-view class="MainScreen"></router-view>
     </keep-alive>
@@ -10,10 +11,12 @@
 <script>
 
 import OceanCanvas from './components/ocean/OceanCanvas.vue';
+import PoemCanvas from './components/poem/PoemCanvas.vue';
 
 export default{
   components:{
-    OceanCanvas
+    OceanCanvas,
+    PoemCanvas
   },
   created:function(){
     this.$store.dispatch('fetchIslandData');

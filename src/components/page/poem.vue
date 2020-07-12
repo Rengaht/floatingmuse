@@ -26,7 +26,7 @@
 
 <script>
 import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
-import PoemItem from '../PoemItem.vue';
+import PoemItem from '../poem/PoemItem.vue';
 import gsap from 'gsap';
 
 export default{		
@@ -37,7 +37,7 @@ export default{
 	},
 	components:{
 		PoemItem,
-		WaveCanvas
+		WaveCanvas,
 	},
 	computed:{
 		location:function(){
@@ -68,6 +68,11 @@ export default{
 		}
 		// this.poem=this.text.join('\n');
 		//this.generatePoem();
+	},
+	activated:function(){
+		for(var i in this.poem){
+			this.$parent.$refs['_poem_canvas'].addSentence(this.poem[i].text);
+		}
 	},
 	updated(){
 		console.log('poem view updated!');

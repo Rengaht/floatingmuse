@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
-import {IslandPortion} from './components/ocean/OceanShader.js';
+import {IslandPortion,IslandCenter} from './components/ocean/OceanShader.js';
 
 const PoemURL="https://mmlab.tw/sea";
 const IslandDataURL="./data/ocean_data.json";
@@ -134,11 +134,11 @@ const store=new Vuex.Store({
 			// var w=state.screenWidth;
 			var h=state.screenHeight;
 
-			var ratw=h*0.625;
+			var ratw=h*0.625; //10:16
 			var rad=h*IslandPortion;
 			return{
 				x:(ratw/2+state.ocean[index].x*rad),
-				y:(h/2+h*.1+state.ocean[index].y*rad)
+				y:(h*IslandCenter+state.ocean[index].y*rad)
 			}
 		},
 		getOceanPositionCanvas:(state)=>(index)=>{
@@ -149,7 +149,7 @@ const store=new Vuex.Store({
 			var rad=h*IslandPortion;
 			return{
 				x:(w/2+state.ocean[index].x*rad),
-				y:(h/2+h*.1+state.ocean[index].y*rad)
+				y:(h*IslandCenter+state.ocean[index].y*rad)
 			}
 		},
 		getIslandPositionCanvas:(state)=>(index)=>{
@@ -164,7 +164,7 @@ const store=new Vuex.Store({
 			var rad=h*IslandPortion;
 			return{
 				x:(w/2+state.island[index].x*rad),
-				y:(h/2+h*.1+state.island[index].y*rad),
+				y:(h*IslandCenter+state.island[index].y*rad),
 				r:state.island[index].r,
 			}
 		},

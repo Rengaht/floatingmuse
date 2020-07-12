@@ -1,7 +1,8 @@
 export const NUM_METABALLS=22;
 export const NUM_METABALLS_TW=5;
 
-export const IslandPortion=0.35;
+export const IslandPortion=0.4;
+export const IslandCenter=0.55;
 
 export const vs=`
     varying vec2 vUv;
@@ -19,6 +20,7 @@ export const fs=`
     uniform float tt;
     uniform float width;
     uniform float height;
+    uniform float layer;
     varying vec2 vUv;
     const vec3 BORDER_COLOR=vec3(0.02,0.22,0.48);
     float rand(float n){return fract(sin(n) * 43758.5453123);}
@@ -42,31 +44,30 @@ export const fs=`
         float mx=(vUv.x-.5)*ratio+.5;
         float my=vUv.y;
         float v = 0.0;
-        float d=0.0;
         for (int i = 0; i < ` + NUM_METABALLS + `; i++) {
             vec3 mb = metaballs[i];
             float dx = mb.x - x;
             float dy = mb.y - y;
             float r = mb.z;
             v += r*r/(dx*dx + dy*dy);
-            d+=sqrt(r*r/(dx*dx + dy*dy));
         }
-        v=v*(noise(vec2(x*ratio*20.0+tt,y*20.0+tt))*.5+.5);
-        d=d*(noise(vec2(x*ratio*30.0+tt,y*30.0+tt))*.5+.5);
+        float curve=20.0+layer*2.0;
+        float d=v*(noise(vec2(x*ratio*20.0+tt,y*20.0+tt))*.5+.5);
+        v=v*(noise(vec2(x*ratio*curve+tt,y*curve+tt))*.5+.5);
         // v=v*rand(vec2(x+tt,y+tt));
-        if(mod(v,0.4)<0.01) gl_FragColor=vec4(BORDER_COLOR,1.0);
+        if(mod(d,0.4)<0.01) gl_FragColor=vec4(BORDER_COLOR,1.0);
         else{
             if (v > 1.0) {
-                float step=floor(v/4.0);
+                float step=v/5.0;
                 float pp=1.0;
-                if(step>=3.0) gl_FragColor = vec4(ocean_color[0], 1.0);
-                else if(step>=2.0) gl_FragColor = vec4(mix(ocean_color[0],ocean_color[1],pp), .5);
-                else if(step>=1.0) gl_FragColor = vec4(mix(ocean_color[1],ocean_color[2],pp),.5);
-                else{
-                    gl_FragColor = vec4(mix(ocean_color[2],ocean_color[3],pp), 0.2);  
+                if(step>=layer*2.0) gl_FragColor = vec4(ocean_color[0], 1.0);
+                else if(step>=layer*1.6) gl_FragColor = vec4(mix(ocean_color[0],ocean_color[1],pp), 1.0);
+                else if(step>=layer*1.2) gl_FragColor = vec4(mix(ocean_color[1],ocean_color[2],pp),1.0);
+                else if(step>=layer){
+                    gl_FragColor = vec4(mix(ocean_color[2],ocean_color[3],pp), 1.0);  
                 } 
             }else{
-                    gl_FragColor = vec4(ocean_color[3], .2);
+                    gl_FragColor = vec4(ocean_color[3], .0);
             }
         }
     }
@@ -82,6 +83,7 @@ export const fs_tw=`
     varying vec2 vUv;
     uniform vec3 ISLAND_COLOR[4];
     uniform float ISLAND_PORTION;
+    uniform float ISLAND_CENTER;
     float rand(float n){return fract(sin(n) * 43758.5453123);}
     float rand(vec2 n) { 
         return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
@@ -98,10 +100,10 @@ export const fs_tw=`
     }
     bool inMask(vec2 p){
         
-        if(p.y>ISLAND_PORTION*2.0) return false;
+        if(p.y>ISLAND_CENTER+ISLAND_PORTION || p.y<ISLAND_CENTER-ISLAND_PORTION) return false;
 
         float ratio=width/height;
-        float my=p.y*1.0/ISLAND_PORTION/2.0;
+        float my=(p.y-ISLAND_CENTER)*1.0/ISLAND_PORTION/2.0+.5;
         
         float mx=(p.x-.5)*ratio*1.0/ISLAND_PORTION/2.0+.5;
         
@@ -134,9 +136,9 @@ export const fs_tw=`
             tmp=vec4(ocean_color[3], .2);
             float step=floor(v/4.0);
             float pp=1.0;
-            if(step>=3.0) tmp =vec4(ocean_color[0], 1.0);
-            else if(step>=2.0) tmp =vec4(ocean_color[1], 1.0);
-            else if(step>=1.0) tmp =vec4(ocean_color[2], 1.0);
+            if(step>=6.0) tmp =vec4(ocean_color[0], 1.0);
+            else if(step>=5.0) tmp =vec4(ocean_color[1], 1.0);
+            else if(step>=4.0) tmp =vec4(ocean_color[2], 1.0);
 
             // if(tt>0.0 && !in_mask) tmp=vec4(ocean_color[3],.2);
         }
