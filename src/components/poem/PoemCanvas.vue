@@ -11,6 +11,7 @@ import {FONT_SIZE,LINE_HEIGHT,MOVE_INTERVAL} from './PoemChar.js';
  
 // const TRANSITON_INTERVAL=2500;
 const NUM_CHAR=50;
+const NUM_POEM_MAX=120;
 const WEATHER_COLOR="#E8FFD3";
 const POEM_COLOR="white";
 const POEM_PADDING=60;
@@ -76,6 +77,12 @@ export default{
 			
 		},
 		addWeather:function(arr,loc,date){
+
+			// TODO: end dummy text
+			for(i in this.dummy_text){
+				this.dummy_text[i].reset();
+			}
+
 			var vFov = this.camera.fov * Math.PI / 180;
 			let destZ=this.height/(2*Math.tan(vFov/2));
 			
@@ -91,23 +98,6 @@ export default{
 			for(var i in arr){
 				let text=arr[i].text;
 				for(var j in text){
-
-					// if(index<this.poem_text.length){ // recycle char
-					// 	this.poem_text[index].updateChar(text[j],
-					// 									startx+j*FONT_SIZE,
-					// 									starty-line*LINE_HEIGHT,
-					// 									1-destZ,
-					// 									WEATHER_COLOR,0,t);
-					// 	// console.log('update char '+index);
-
-					// }else{
-					// 	this.addChar(text[j],
-					// 				startx+j*FONT_SIZE,
-					// 				starty-line*LINE_HEIGHT,
-					// 				1-destZ,
-					// 				WEATHER_COLOR,0,t);
-					// }
-
 					this.addChar(index,text[j],
 								startx+j*FONT_SIZE,
 								starty-line*LINE_HEIGHT,
@@ -120,28 +110,12 @@ export default{
 				line+=2;
 			}
 
-			let poem_delay=index*CHAR_STAGGER_INTERVAL+MOVE_INTERVAL;
+			let poem_delay=MOVE_INTERVAL;
 			line=0;
 			starty-=LINE_HEIGHT;
 			for(i in arr){
 				let poem=arr[i].poem;
 				for(var k in poem){
-
-					// if(index<this.poem_text.length){ // recycle char
-					// 	this.poem_text[index].updateChar(poem[k],
-					// 									startx+k*FONT_SIZE,
-					// 									starty-line*LINE_HEIGHT,
-					// 									1-destZ,
-					// 									POEM_COLOR,0,t+poem_delay);
-					// 	// console.log('update char '+index);
-
-					// }else{
-					// 	this.addChar(poem[k],
-					// 				startx+k*FONT_SIZE,
-					// 				starty-line*LINE_HEIGHT,
-					// 				1-destZ,
-					// 				POEM_COLOR,0,t+poem_delay);
-					// }
 					this.addChar(index,poem[k],
 							startx+k*FONT_SIZE,
 							starty-line*LINE_HEIGHT,
@@ -153,9 +127,7 @@ export default{
 				}
 				line+=2;
 			}
-			// loc;
-			// date;
-			let weather_delay=index*CHAR_STAGGER_INTERVAL+MOVE_INTERVAL;
+			let weather_delay=MOVE_INTERVAL*.5;
 			
 			let locx=-startx;
 			let locy=-starty;
@@ -230,6 +202,7 @@ export default{
 		},
 		resetChar:function(){
 			for(var i in this.dummy_text){
+				// this.dummy_text[i].setRepeat(-1)
 				this.dummy_text[i].restart();
 			}
 		},
@@ -248,6 +221,7 @@ export default{
 	mounted(){
 		this.init();
 		for(var i=0;i<NUM_CHAR;++i) this.insertChar('A');
+		for(i=0;i<NUM_POEM_MAX*2;++i) this.insertChar('A',0,0,0,WEATHER_COLOR,0,0);
 
 		this.animate();
 	}

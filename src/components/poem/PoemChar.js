@@ -102,4 +102,7 @@ export default class PoemChar{
 	restart(){
 		this.tween.restart();
 	}
+	setRepeat(set_){
+		this.tween.repeat(set_);
+	}
 }
