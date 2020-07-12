@@ -202,7 +202,7 @@ export default{
 
 
 
-			this.renderer.render(this.scene, this.camera)
+			this.renderer.render(this.scene, this.camera);
 		},
 		packSpots:function(arr,len){
 			// console.log(arr);
@@ -266,9 +266,8 @@ export default{
 					this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL,pos.r);	
 				}
 			}
-			this.stage='island';
+			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
-
 			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
 		},
 		goFloat:function(){
@@ -277,7 +276,7 @@ export default{
 				this.spots[i].stage='floating';
 				this.spots[i].setDest(undefined,undefined,TRANSITON_INTERVAL);
 			}
-			this.stage='floating';
+			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
 			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:1.0});
 		},
@@ -297,8 +296,15 @@ export default{
 										this.height*(.5+rad*Math.cos(ang)),TRANSITON_INTERVAL);	
 				} 
 			}	
-			this.stage='poem';
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
+		},
+		setStage:function(set_,index){
+			switch(set_){
+				case 'floating': this.goFloat(); break;
+				case 'island': this.goIsland(index); break;
+				case 'poem':this.goPoem();break;
+			}
+			this.stage=set_;
 		},
 	},
 	mounted(){

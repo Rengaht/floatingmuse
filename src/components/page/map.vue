@@ -89,7 +89,7 @@ export default{
 				}
 			});
 
-			this.$parent.$refs['_ocean_canvas'].goPoem(parseInt(index));
+			this.$parent.setStage('poem',parseInt(index));
 		}
 	},
 	created:function(){
@@ -104,7 +104,8 @@ export default{
 	},
 	activated:function(){
 
-		this.$parent.$refs['_ocean_canvas'].goIsland();		
+		this.$parent.setStage('island');				
+		
     },
   
 }

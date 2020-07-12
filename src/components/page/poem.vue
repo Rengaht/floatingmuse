@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div id="_poem" class="CenterWrapper">		
+		<!-- <div id="_poem" class="CenterWrapper">		
 			<div class="PoemRegion">
 				<poem-item 
 					v-for="item in poem"
@@ -12,7 +12,7 @@
 		<div class="TitleRegion">
 			<div class="title">{{location}}</div>
 			<div class="title">{{date_str}}</div>
-		</div>	
+		</div>	 -->
 		<div class="ButtonRegion">
 				<div class="Button" @click="rewriteClick">
 					<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
@@ -26,8 +26,8 @@
 
 <script>
 import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
-import PoemItem from '../poem/PoemItem.vue';
-import gsap from 'gsap';
+// import PoemItem from '../poem/PoemItem.vue';
+// import gsap from 'gsap';
 
 export default{		
 	data:function(){
@@ -36,8 +36,16 @@ export default{
 		}
 	},
 	components:{
-		PoemItem,
+		// PoemItem,
 		WaveCanvas,
+	},
+	watch:{
+		'$store.state.generating':function(val){
+			if(!val){
+				// console.log('finish generating!');
+				this.$parent.$refs['_poem_canvas'].addWeather(this.poem,this.location,this.date_str);
+			}
+		},
 	},
 	computed:{
 		location:function(){
@@ -61,25 +69,24 @@ export default{
 	},
 	created:function(){
 
-
-		if(!this.$store.state.generating){
-			this.$router.push({name:'home'});
-			return;
-		}
+		// TODO: check autoback!
+		
+		// if(!this.$store.state.generating){
+		// 	this.$router.push({name:'home'});
+		// 	return;
+		// }
 		// this.poem=this.text.join('\n');
 		//this.generatePoem();
 	},
 	activated:function(){
-		for(var i in this.poem){
-			this.$parent.$refs['_poem_canvas'].addSentence(this.poem[i].text);
-		}
+		//this.$parent.$refs['_poem_canvas'].addWeather(this.poem);
 	},
 	updated(){
 		console.log('poem view updated!');
-		gsap.from('.PoemItem',{
-			opacity:0,
-			stagger:0.1
-		});
+		// gsap.from('.PoemItem',{
+		// 	opacity:0,
+		// 	stagger:0.1
+		// });
 	}
 }
 

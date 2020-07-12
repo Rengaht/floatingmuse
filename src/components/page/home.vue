@@ -44,7 +44,7 @@ export default {
     activated:function(){
 		// gsap.to('#_title',{y:100,duration:3});
 		// this.$parent.setOceanStatus('float');
-		this.$parent.$refs['_ocean_canvas'].goFloat();				
+		this.$parent.setStage('floating');				
 		// this.$refs._title_canvas.init();
 
 		// this.update();

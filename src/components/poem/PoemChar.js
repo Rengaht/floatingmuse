@@ -1,35 +1,45 @@
 import {TweenMax,Sine} from 'gsap';
 import * as THREE from 'three';
 
-const MOVE_INTERVAL=5000;
-const FONT_SIZE=100;
+export const MOVE_INTERVAL=2000;
+
+export const FONT_SIZE=30;
+export const LINE_HEIGHT=FONT_SIZE*1.5;
+const TEXT_WIDTH=FONT_SIZE*1.2;
+
+const START_Z=-2200;
 
 export default class PoemChar{
-	constructor(text,x,y){
+	constructor(text,destx,desty,destz,color,repeat=-1,delay){
 
-		this.text=text;
+		this.color=color;
+		this.createObject(text);
+		this.tween;
+		this.setDest(destx,desty,destz,repeat,delay);
+		
+		this.repeat=repeat;
+		this.stage='floating';
 
+	}
+	createObject(text){
 		// create canvas
 		this.canvas=document.createElement('canvas');
-		let context=this.canvas.getContext('2d');
-		context.fillStyle='transparant';
+		this.context=this.canvas.getContext('2d');
+		this.context.fillStyle='transparant';
 		// let metrics=context.measureText(text);
-		let textWidth=100;
-		let textHeight=100;
 		// console.log(text+' = '+textWidth+' '+textHeight);
 
-		this.canvas.width=textWidth;
-		this.canvas.height=textHeight;
-		context.textAlign="center";
-		context.textBaseline="middle";
-		context.font=FONT_SIZE+'px Arial';
-		context.fillStyle="#ffffff";
-		context.fillText(text,textWidth/2,textHeight/2);
+		this.canvas.width=TEXT_WIDTH;
+		this.canvas.height=TEXT_WIDTH;
+		this.context.textAlign="center";
+		this.context.textBaseline="middle";
+		this.context.font=FONT_SIZE+'px Noto Sans TC';
+		
+		this.drawText(text);
 
-		var texture=new THREE.CanvasTexture(this.canvas);
-		// texture.needsUpdate=true;
-		var material=new THREE.SpriteMaterial({
-												map:texture,
+		this.texture=new THREE.CanvasTexture(this.canvas);
+		this.texture.needsUpdate=true;
+		var material=new THREE.SpriteMaterial({map:this.texture,
 												color:0xffffff,
 												fog:true,
 												depthWrite:false,});
@@ -37,60 +47,59 @@ export default class PoemChar{
 
 		this.textObject = new THREE.Object3D();
 		// var sprite = new THREE.Sprite(texture);
-		this.textObject.textHeight = FONT_SIZE;
-		this.textObject.textWidth = (textWidth / textHeight) * this.textObject.textHeight;
-		sprite.scale.set(textWidth / textHeight * FONT_SIZE, FONT_SIZE, 1);
-		//  sprite.position.set(10,10,0);
+		this.textObject.textHeight = TEXT_WIDTH;
+		this.textObject.textWidth = TEXT_WIDTH;
+		sprite.scale.set(FONT_SIZE, FONT_SIZE, 1);
+		
 		this.textObject.add(sprite);
 
-		// document.getElementsByTagName("body")[0].appendChild(this.canvas);
+	}
+	drawText(text){
+		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+		
+		this.context.fillStyle=this.color;
+		this.context.fillText(text,TEXT_WIDTH/2,TEXT_WIDTH/2);
 
-		this.x=0;
-		this.y=0;
-		this.z=-1000;
 
-		this.tween;
-		this.setDest(x,y,0);
-
-		this.stage='floating'; // floating, island, poem
-		this.is_tw=false;
+	}
+	updateChar(text,destx,desty,destz,color,repeat=-1,delay){
+		this.color=color;
+		this.drawText(text);
+		this.texture.needsUpdate=true;
+		
+		this.setDest(destx,desty,destz,repeat,delay);
 	}
 	atDest(){
 		return !this.tween.isActive();
 	}
-	step(){
+	setDest(destx,desty,destz,repeat,delay){
+
+		let interval=MOVE_INTERVAL*(Math.random()*1.0+1.0);
+		if(delay===undefined) interval*Math.random()*.5;	
 	
-		if(this.atDest()){
-			if(this.stage==="floating"){
-				// console.log('float');
-				// if(Math.random()*200<1){
-					this.setDest();
-				// }
-			}			
-		}
-	}
-	setDest(destx,desty,destz,interval){
-
-		let delay=0;
-		if(interval===undefined){
-			interval=MOVE_INTERVAL*(Math.random()*1.0+1.0);
-			delay=interval*Math.random()*.5/1000.0;	
-		} 
-		
-		if(destx===undefined) destx=Math.random()*1000-500;
-		if(desty===undefined) desty=Math.random()*1000-500;
-		if(destz===undefined) destz=1000;
-
+		var p=Math.random();
+		this.textObject.position.x=destx*p;
+		this.textObject.position.y=desty*p;
+		this.textObject.position.z=START_Z;
 		
 		if(this.tween) this.tween.kill();
-		this.tween=TweenMax.to(this,interval/1000,{
+		this.tween=TweenMax.to(this.textObject.position,interval/1000.0,{
 			x:destx,
 			y:desty,
 			z:destz,
 			overwrite:'all',
 			ease:Sine.easeInOut,
-			delay:delay,
-		});	
+			delay:delay/1000,
+			repeat:repeat,
+		});
+		// this.tween.stop();
 		
+	}
+	reset(){
+		if(this.tween) this.tween.pause();
+		this.textObject.position.z=START_Z;
+	}
+	restart(){
+		this.tween.restart();
 	}
 }

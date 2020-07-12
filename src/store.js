@@ -4,7 +4,7 @@ import axios from 'axios';
 import VueAxios from 'vue-axios';
 import {IslandPortion,IslandCenter} from './components/ocean/OceanShader.js';
 
-const PoemURL="https://mmlab.tw/sea";
+const PoemURL="https://mmlab.tw/muse/sea";
 const IslandDataURL="./data/ocean_data.json";
 
 Vue.use(Vuex);
@@ -16,7 +16,7 @@ const store=new Vuex.Store({
 	state:{
 		location:'',
 		poem:[],
-		generating:false,
+		generating:true,
 		ocean:[],
 		island:[],
 		screenWidth:document.documentElement.clientWidth,
@@ -83,7 +83,14 @@ const store=new Vuex.Store({
 				commit('setGenerating',false);
 			
 			}).catch(error=>{
-					console.log(error);
+				console.log(error);
+				// commit('setGenerating',false);
+
+				var poem_=[];
+				for(var i=0;i<this.state.poem.length;++i) poem_.push("############");
+				commit('setPoem',poem_);				
+				commit('setGenerating',false);
+			
 			});
 
 		},

@@ -20,6 +20,15 @@ export default{
   },
   created:function(){
     this.$store.dispatch('fetchIslandData');
+  },
+  methods:{
+    setStage:function(set_){
+
+        this.$refs._ocean_canvas.setStage(set_);
+        this.$refs._poem_canvas.setStage(set_);
+
+    }
+
   }
 }
 </script>
