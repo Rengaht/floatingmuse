@@ -23,9 +23,9 @@ export default{
     this.$store.dispatch('fetchDummyChar');
   },
   methods:{
-    setStage:function(set_){
+    setStage:function(set_,index){
 
-        this.$refs._ocean_canvas.setStage(set_);
+        this.$refs._ocean_canvas.setStage(set_,index);
         this.$refs._poem_canvas.setStage(set_);
 
     }

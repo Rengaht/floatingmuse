@@ -7,7 +7,7 @@
 import * as THREE from 'three';
 import {vs,fs,fs_tw,NUM_METABALLS,NUM_METABALLS_TW,IslandPortion,IslandCenter} from './OceanShader.js';
 import OceanSpot from './OceanSpot.js';
-import {TweenMax} from 'gsap';
+import {TweenMax,Expo} from 'gsap';
 
 const TRANSITON_INTERVAL=3000;
 // import OceanShader from './OceanShader';
@@ -87,7 +87,19 @@ export default{
 					},
 					layer:{
 						value:1.0
-					}
+					},
+					roi_pos_x:{
+						value:.5,
+					},
+					roi_pos_y:{
+						value:.5,
+					},
+					roi_size_x:{
+						value:1,	
+					},
+					roi_size_y:{
+						value:1,	
+					},
 				},
 				transparent: true,
 				vertexShader:vs,
@@ -131,6 +143,18 @@ export default{
 					ISLAND_CENTER:{
 						value:1-IslandCenter,
 					},
+					roi_pos_x:{
+						value:.5,
+					},
+					roi_pos_y:{
+						value:.5,
+					},
+					roi_size_x:{
+						value:1,	
+					},
+					roi_size_y:{
+						value:1,	
+					},
 				},
 				transparent: true,
 				vertexShader:vs,
@@ -167,7 +191,7 @@ export default{
 			// 	this.material_ocean.uniforms.metaballs.value=data;
 			// 	this.material_taiwan.uniforms.metaballs.value=new Float32Array(3*NUM_METABALLS_TW);
 			// 	// this.material_taiwan.uniforms.metaballs.value=data;
-			if(this.stage==="island"){
+			if(this.stage==="island" || this.stage==='poem'){
 				var data_ocean=this.packSpots(this.spots.filter(p=>!p.is_tw),NUM_METABALLS);
 				var data_tw=this.packSpots(this.spots.filter(p=>p.is_tw));
 				
@@ -269,6 +293,9 @@ export default{
 			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
 			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
+
+			this.setShaderROI(.5,.5,1,1,TRANSITON_INTERVAL*.5,0);
+
 		},
 		goFloat:function(){
 			var i;
@@ -279,30 +306,53 @@ export default{
 			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
 			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:1.0});
+
+			this.setShaderROI(.5,.5,1,1,TRANSITON_INTERVAL*2,0);
+
 		},
 		goPoem:function(index){
 			
 			console.log('go poem!');
+			index+=NUM_METABALLS_TW;
 
-			for(var i=0;i<NUM_METABALLS;++i){
-				this.spots[i].stage='island';
-				if(i==index || Math.random()*3<1){
-					var dest_rad=Math.min(this.width,this.height)*.5*(Math.random()*.5+.5);
-					this.spots[i].setDest(this.width/2+(Math.random()*2-1)*dest_rad,this.height/2+(Math.random()*2-1)*dest_rad,TRANSITON_INTERVAL,.8);	
-				}else{
-					var ang=Math.random()*Math.PI*2;
-					var rad=(Math.random()*.4+.5);
-					this.spots[i].setDest(this.width*(.5+rad*Math.sin(ang)),
-										this.height*(.5+rad*Math.cos(ang)),TRANSITON_INTERVAL);	
-				} 
-			}	
-			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
+			// for(var i=0;i<NUM_METABALLS;++i){
+			// 	this.spots[i].stage='island';
+			// 	if(i==index || Math.random()*3<1){
+			// 		var dest_rad=Math.min(this.width,this.height)*.5*(Math.random()*.5+.5);
+			// 		this.spots[i].setDest(this.width/2+(Math.random()*2-1)*dest_rad,this.height/2+(Math.random()*2-1)*dest_rad,TRANSITON_INTERVAL,.8);	
+			// 	}else{
+			// 		var ang=Math.random()*Math.PI*2;
+			// 		var rad=(Math.random()*.4+.5);
+			// 		this.spots[i].setDest(this.width*(.5+rad*Math.sin(ang)),
+			// 							this.height*(.5+rad*Math.cos(ang)),TRANSITON_INTERVAL);	
+			// 	} 
+			// }	
+			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:1});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:2.0});
+
+			// console.log('dest pos= '+this.spots[index].x+' , '+this.spots[index].y);
+			this.setShaderROI(this.spots[index].x/this.width,this.spots[index].y/this.height,.1,.1,TRANSITON_INTERVAL*.5,0);
+
+			
+		},
+		setShaderROI:function(x,y,w,h,interval,delay){
+			TweenMax.to(this.material_ocean.uniforms.roi_pos_x,interval/1000.0,{value:x,delay:delay,ease:Expo.easeOut});
+			TweenMax.to(this.material_ocean.uniforms.roi_pos_y,interval/1000.0,{value:y,delay:delay,ease:Expo.easeOut});
+			TweenMax.to(this.material_ocean.uniforms.roi_size_x,interval/1000.0,{value:w,delay:delay,ease:Expo.easeOut});
+			TweenMax.to(this.material_ocean.uniforms.roi_size_y,interval/1000.0,{value:h,delay:delay,ease:Expo.easeOut});
+
+			TweenMax.to(this.material_taiwan.uniforms.roi_pos_x,interval/1000.0,{value:x,delay:delay,ease:Expo.easeOut});
+			TweenMax.to(this.material_taiwan.uniforms.roi_pos_y,interval/1000.0,{value:y,delay:delay,ease:Expo.easeOut});
+			TweenMax.to(this.material_taiwan.uniforms.roi_size_x,interval/1000.0,{value:w,delay:delay,ease:Expo.easeOut});
+			TweenMax.to(this.material_taiwan.uniforms.roi_size_y,interval/1000.0,{value:h,delay:delay,ease:Expo.easeOut});
+
+
 		},
 		setStage:function(set_,index){
 			switch(set_){
 				case 'floating': this.goFloat(); break;
-				case 'island': this.goIsland(index); break;
-				case 'poem':this.goPoem();break;
+				case 'island': this.goIsland(); break;
+				case 'poem':this.goPoem(index);break;
 			}
 			this.stage=set_;
 		},

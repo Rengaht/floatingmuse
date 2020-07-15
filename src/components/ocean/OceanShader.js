@@ -21,6 +21,10 @@ export const fs=`
     uniform float width;
     uniform float height;
     uniform float layer;
+    uniform float roi_pos_x;
+    uniform float roi_pos_y;
+    uniform float roi_size_x;
+    uniform float roi_size_y;
     varying vec2 vUv;
     const vec3 BORDER_COLOR=vec3(0.02,0.22,0.48);
     float rand(float n){return fract(sin(n) * 43758.5453123);}
@@ -37,12 +41,22 @@ export const fs=`
         vec2 b = floor(n), f = smoothstep(vec2(0.0), vec2(1.0), fract(n));
         return mix(mix(rand(b), rand(b + d.yx), f.x), mix(rand(b + d.xy), rand(b + d.yy), f.x), f.y);
     }
+    vec2 mapCoord(vec2 p){
+        float ratio=width/height;
+        float rx=(p.x-.5)*ratio*roi_size_x+roi_pos_x;
+        float ry=(p.y-.5)*roi_size_y+roi_pos_y;
+
+        return vec2(rx,ry);
+    }
     void main(){
         float ratio=width/height;
-        float x=vUv.x;
-        float y=vUv.y;
-        float mx=(vUv.x-.5)*ratio+.5;
-        float my=vUv.y;
+        vec2 p=mapCoord(vUv.xy);
+        float x=p.x;
+        float y=p.y;
+        
+        float mx=(x-.5)*ratio+.5;
+        float my=y;
+        
         float v = 0.0;
         for (int i = 0; i < ` + NUM_METABALLS + `; i++) {
             vec3 mb = metaballs[i];
@@ -84,6 +98,10 @@ export const fs_tw=`
     uniform vec3 ISLAND_COLOR[4];
     uniform float ISLAND_PORTION;
     uniform float ISLAND_CENTER;
+    uniform float roi_pos_x;
+    uniform float roi_pos_y;
+    uniform float roi_size_x;
+    uniform float roi_size_y;
     float rand(float n){return fract(sin(n) * 43758.5453123);}
     float rand(vec2 n) { 
         return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
@@ -112,10 +130,19 @@ export const fs_tw=`
         
         return in_mask;
     }
+     vec2 mapCoord(vec2 p){
+        float ratio=width/height;
+        float rx=(p.x-.5)*ratio*roi_size_x+roi_pos_x;
+        float ry=(p.y-.5)*roi_size_y+roi_pos_y;
+
+        return vec2(rx,ry);
+    }
     void main(){
         float ratio=width/height;
-        float x=vUv.x;
-        float y=vUv.y;
+        vec2 p=mapCoord(vUv.xy);
+        float x=p.x;
+        float y=p.y;
+        
         float mx=(vUv.x-.5)*ratio+.5;
         float my=vUv.y;
         float v = 0.0;
@@ -129,7 +156,7 @@ export const fs_tw=`
             d+=sqrt(r*r/(dx*dx + dy*dy));
         }
         v=v*(noise(vec2(x*ratio*20.0+tt,y*20.0+tt))*.5+.5);
-        bool in_mask=inMask(vUv.xy);
+        bool in_mask=inMask(vec2(x,y));
         vec4 tmp=vec4(ocean_color[3],.2);
         vec4 dest=vec4(mix(ISLAND_COLOR[3],ISLAND_COLOR[2],y),tt);
         if(v > 1.0){
