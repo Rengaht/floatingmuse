@@ -15,7 +15,9 @@ const NUM_POEM_MAX=120;
 const WEATHER_COLOR="#E8FFD3";
 const POEM_COLOR="white";
 const POEM_PADDING=60;
-const CHAR_STAGGER_INTERVAL=100;
+const CHAR_STAGGER_INTERVAL=200;
+
+const POEM_DELAY_INTERVAL=5000;
 
 export default{
 	name:'poem-canvas',
@@ -29,7 +31,17 @@ export default{
 			dummy_text:[],
 			poem_text:[],
 			cameraZ:2000,
-			stage:'floating'
+			stage:'floating',
+			author:'漂浮繆斯',
+		}
+	},
+	computed:{
+		textwidth:function(){
+			return Math.min(this.width,this.height*0.625);
+		},
+		destZ:function(){
+			var vFov=this.camera.fov*Math.PI/180;
+			return this.height/(2*Math.tan(vFov/2));
 		}
 	},
 	watch:{
@@ -83,68 +95,91 @@ export default{
 				this.dummy_text[i].reset();
 			}
 
-			var vFov = this.camera.fov * Math.PI / 180;
-			let destZ=this.height/(2*Math.tan(vFov/2));
 			
 
-			let len=arr.length;
-			let startx=-(this.height*0.625-POEM_PADDING)/(this.width/this.height)/2;
-			let starty=LINE_HEIGHT*len;
-			let t=0;
+			let len=0;
+			for(i in arr){
+				len+=arr[i].poem.length+1;
+				if(arr[i].concat) len-=1;
+			}
+			console.log('#line= '+len);
+			let startx=-(this.textwidth/2-POEM_PADDING);//(this.width/this.height)/2;
+			let starty=LINE_HEIGHT*(len+5)/2;
+			// let t=0;
 			let index=0;
-			let line=0;
-
+			let lastx=0;
+				
+			let destz=this.camera.position.z-this.destZ;
+			let poem_delay=POEM_DELAY_INTERVAL;
 			
 			for(var i in arr){
 				let text=arr[i].text;
-				for(var j in text){
-					this.addChar(index,text[j],
-								startx+j*FONT_SIZE,
-								starty-line*LINE_HEIGHT,
-								1-destZ,
-								WEATHER_COLOR,0,t);
+				[index,starty,lastx]=this.addLine(index,text,startx,starty,destz,WEATHER_COLOR,0,0)
 
-					t+=CHAR_STAGGER_INTERVAL;
-					index++;
-				}
-				line+=2;
-			}
-
-			let poem_delay=MOVE_INTERVAL;
-			line=0;
-			starty-=LINE_HEIGHT;
-			for(i in arr){
 				let poem=arr[i].poem;
 				for(var k in poem){
-					this.addChar(index,poem[k],
-							startx+k*FONT_SIZE,
-							starty-line*LINE_HEIGHT,
-							1-destZ,
-							POEM_COLOR,0,t+poem_delay);
 
-					t+=CHAR_STAGGER_INTERVAL;
-					index++;
+					if(k==0 && arr[i].concat){
+						// console.log('first line concat!');
+						starty+=LINE_HEIGHT;
+						[index,starty,lastx]=this.addLine(index,poem[k],
+													lastx,
+													starty,
+													destz,
+													POEM_COLOR,0,poem_delay);
+					}else{
+						[index,starty,lastx]=this.addLine(index,poem[k],
+													startx,
+													starty,
+													destz,
+													POEM_COLOR,0,poem_delay);
+					}
 				}
-				line+=2;
 			}
-			let weather_delay=MOVE_INTERVAL*.5;
 			
-			let locx=-startx;
-			let locy=-starty;
+			let weather_delay=POEM_DELAY_INTERVAL+MOVE_INTERVAL;
+			
+			let locx=this.textwidth/2-POEM_PADDING;
+			let locy=starty-LINE_HEIGHT;
 
-			for(i in loc){
-				this.addChar(index,loc[i],locx+i*FONT_SIZE,locy,1-destZ,POEM_COLOR,0,weather_delay+t);
+			[index,locy,lastx]=this.addLine(index,this.author,locx-this.author.length*FONT_SIZE,locy,destz,POEM_COLOR,0,weather_delay);
+			
+			locy-=LINE_HEIGHT;
+			[index,locy,lastx]=this.addLine(index,loc,locx-loc.length*FONT_SIZE,locy,destz,POEM_COLOR,0,weather_delay);
+
+			//locy-=LINE_HEIGHT;
+			[index,locy,lastx]=this.addLine(index,date,locx-date.length*FONT_SIZE*.5,locy,destz,POEM_COLOR,0,weather_delay);
+
+
+		},
+		addLine:function(index,text,startx,starty,destz,color,repeat,delay){
+			var t=0;
+			var lastx=0;
+			var lasty=starty;
+			for(var k in text){
+				
+				if(lastx+startx>=this.textwidth/2-POEM_PADDING){
+					lastx=0;
+					startx=-this.textwidth/2+POEM_PADDING;
+					lasty-=LINE_HEIGHT;
+				}
+
+				lastx+=FONT_SIZE*(this.isASCII(text[k])?-.25:0);
+
+				this.addChar(index,text[k],
+							lastx+startx,
+							lasty,
+							destz,
+							color,0,t+delay);
+
+				lastx+=FONT_SIZE*(this.isASCII(text[k])?.75:1);
+				
 				t+=CHAR_STAGGER_INTERVAL;
 				index++;
 			}
+			lasty-=LINE_HEIGHT;
 
-			for(i in date){
-				this.addChar(index,date[i],locx+i*FONT_SIZE*.5,locy-LINE_HEIGHT,1-destZ,POEM_COLOR,0,weather_delay+t);
-				t+=CHAR_STAGGER_INTERVAL;
-				index++;
-			}
-			console.log(weather_delay);
-
+			return [index,lasty,lastx+startx];
 		},
 		addChar:function(index,text,destx,desty,destz,color='white',repeat=-1,delay){
 			
@@ -185,6 +220,11 @@ export default{
 			
 			this.scene.add(pchar.textObject);
 		},
+		isASCII: function(str){
+			// var t=/^\w+$/.test(str);
+			// if(t) console.log(str);
+			return str.charCodeAt(0)<128;
+		},
 		clear:function(){
 			
 			for(var i in this.poem_text){
@@ -201,8 +241,14 @@ export default{
 			// this.renderer.render(this.scene, this.camera);
 		},
 		resetChar:function(){
+			
+			var tmp=Math.floor(Math.random()*1000);
+
 			for(var i in this.dummy_text){
 				// this.dummy_text[i].setRepeat(-1)
+				var t=this.$store.getters.getDummyChar(i+tmp);
+				// console.log(t);
+				this.dummy_text[i].drawText(t);
 				this.dummy_text[i].restart();
 			}
 		},
@@ -220,12 +266,11 @@ export default{
 	},
 	mounted(){
 		this.init();
-		for(var i=0;i<NUM_CHAR;++i) this.insertChar('A');
+		for(var i=0;i<NUM_CHAR;++i) this.insertChar(this.$store.getters.getDummyChar(i));
 		for(i=0;i<NUM_POEM_MAX*2;++i) this.insertChar('A',0,0,0,WEATHER_COLOR,0,0);
 
 		this.animate();
-	}
-
+	},
 }
 </script>
 <style lang="scss" scoped>

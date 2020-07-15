@@ -6,10 +6,18 @@ import {IslandPortion,IslandCenter} from './components/ocean/OceanShader.js';
 
 const PoemURL="https://mmlab.tw/muse/sea";
 const IslandDataURL="./data/ocean_data.json";
+const DummyCharURL="./data/dummy_char.txt";
 
 Vue.use(Vuex);
 Vue.use(VueAxios,axios);
 
+
+function shuffleArray(array) {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
+}
 // export const IslandPortion=.35;
 
 const store=new Vuex.Store({
@@ -20,7 +28,8 @@ const store=new Vuex.Store({
 		ocean:[],
 		island:[],
 		screenWidth:document.documentElement.clientWidth,
-		screenHeight:document.documentElement.clientHeight
+		screenHeight:document.documentElement.clientHeight,
+		dummyChar:[],
 	},
 	mutations:{
 		setWeatherText(state,set){
@@ -37,12 +46,24 @@ const store=new Vuex.Store({
 		setPoem(state,set){
 
 			for(var i in state.poem){
+
+				var str_=set[i].replace(state.poem[i].text,'');
+
+				var concat=(str_[0]!=='\n');
+				// console.log('concat= '+concat);
+
+				var poem_=str_.split('\n');
+				poem_=poem_.filter(el=>el.length>0);
+				
 				var tmp_={
 					text:state.poem[i].text,
-					poem:set[i].replace(state.poem[i].text,'')
+					poem:poem_,
+					concat:concat,
 				};
 				state.poem.splice(i,1,tmp_);
 			}
+
+			// console.log(this.state.poem);
 		},
 		setGenerating(state,set){
 			state.generating=set;			
@@ -60,7 +81,10 @@ const store=new Vuex.Store({
 		},
 		setIslandData(state,data){
 			state.island=data;
-		}
+		},
+		setDummyChar(state,data){
+			state.dummyChar=data;
+		},
 	},
 	actions:{
 		generatePoem:function({commit}){
@@ -76,9 +100,9 @@ const store=new Vuex.Store({
 			Vue.axios.post(PoemURL,weather_text)
 			.then(res=>{
 
-				console.log('res=> ',res);
+				// console.log('res=> ',res);
 				var poem_=res.data.split('#');
-				
+
 				commit('setPoem',poem_);				
 				commit('setGenerating',false);
 			
@@ -128,7 +152,20 @@ const store=new Vuex.Store({
 			}).catch(err=>{
 				console.log(err);
 			});			
-		}
+		},
+		fetchDummyChar:function({commit}){
+			Vue.axios.get(DummyCharURL).then(res=>{
+
+
+				var data=res.data.split('');
+				shuffleArray(data);
+				// console.log(data);
+				commit('setDummyChar',data);
+				console.log('load dummyChars!');
+			}).catch(err=>{
+				console.log(err);
+			});			
+		},
 	},
 	getters:{
 		getWeatherText:function(state){
@@ -174,6 +211,11 @@ const store=new Vuex.Store({
 				y:(h*IslandCenter+state.island[index].y*rad),
 				r:state.island[index].r,
 			}
+		},
+		getDummyChar:(state)=>(index)=>{
+			let t=state.dummyChar[index%state.dummyChar.length];
+			// console.log(t);
+			return t;
 		},
 	}
 

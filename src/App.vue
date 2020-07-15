@@ -20,6 +20,7 @@ export default{
   },
   created:function(){
     this.$store.dispatch('fetchIslandData');
+    this.$store.dispatch('fetchDummyChar');
   },
   methods:{
     setStage:function(set_){

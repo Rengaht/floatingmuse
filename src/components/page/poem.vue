@@ -30,11 +30,11 @@ import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 // import gsap from 'gsap';
 
 export default{		
-	data:function(){
-		return{
-			date_str:new Date().toLocaleString()
-		}
-	},
+	// data:function(){
+	// 	return{
+	// 		date_str:new Date().toLocaleString()
+	// 	}
+	// },
 	components:{
 		// PoemItem,
 		WaveCanvas,
@@ -48,6 +48,17 @@ export default{
 		},
 	},
 	computed:{
+		date_str:function(){
+			var today=new Date();
+			var m=today.getMonth();
+			var d=today.getDate();
+
+			// var hh=today.getHour();
+			// var mm=today.getMiniute();
+			// var ss=today.getSecond();
+
+			return today.getFullYear()+'/'+this.pad(m,2)+'/'+this.pad(d,2);
+		},
 		location:function(){
 			return this.$store.state.location;
 		},
@@ -59,13 +70,20 @@ export default{
 		}
 	},
 	methods:{
-		rewriteClick:function(){			
+		rewriteClick:function(){	
+
+
 			this.date_str=new Date().toLocaleString();
 			this.$store.dispatch('generatePoem');			
 		},
 		homeClick:function(){
 			this.$router.push({name:'home'});
-		}		
+		},
+		pad:function(n,width,z){
+			z = z || '0';
+			n = n + '';
+			return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
+		}
 	},
 	created:function(){
 

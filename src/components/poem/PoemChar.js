@@ -60,12 +60,13 @@ export default class PoemChar{
 		this.context.fillStyle=this.color;
 		this.context.fillText(text,TEXT_WIDTH/2,TEXT_WIDTH/2);
 
+		if(this.texture) this.texture.needsUpdate=true;
+		
 
 	}
 	updateChar(text,destx,desty,destz,color,repeat=-1,delay){
 		this.color=color;
 		this.drawText(text);
-		this.texture.needsUpdate=true;
 		
 		this.setDest(destx,desty,destz,repeat,delay);
 	}
