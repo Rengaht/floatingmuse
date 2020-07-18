@@ -5,7 +5,7 @@
 
 <script type="text/javascript">
 import * as THREE from 'three';
-import {vs,fs,fs_tw,NUM_METABALLS,NUM_METABALLS_TW,IslandPortion,IslandCenter} from './OceanShader.js';
+import {vs,fs,fs_tw,NUM_METABALLS,NUM_METABALLS_TW} from './OceanShader.js';
 import OceanSpot from './OceanSpot.js';
 import {TweenMax,Expo} from 'gsap';
 
@@ -86,7 +86,7 @@ export default{
 						value:planeHeight
 					},
 					layer:{
-						value:1.0
+						value:5.0
 					},
 					roi_pos_x:{
 						value:.5,
@@ -105,6 +105,10 @@ export default{
 				vertexShader:vs,
 				fragmentShader:fs
 			});
+
+
+			let mask_region=this.$store.getters.getMaskRegion;
+			// console.log(mask_region);
 
 			this.material_taiwan=new THREE.ShaderMaterial({
 				uniforms:{
@@ -137,11 +141,11 @@ export default{
 												19/256,160/256,182/256,
 												18/256,86/256,142/256]),
 					},
-					ISLAND_PORTION:{
-						value:IslandPortion,
-					},
-					ISLAND_CENTER:{
-						value:1-IslandCenter,
+					mask_region:{
+						value:new Float32Array([mask_region.x/this.width,
+												mask_region.y/this.height,
+												mask_region.w/this.width,
+												mask_region.w/this.height]),
 					},
 					roi_pos_x:{
 						value:.5,
@@ -160,6 +164,8 @@ export default{
 				vertexShader:vs,
 				fragmentShader:fs_tw
 			});
+
+			// console.log(this.material_taiwan.uniforms.mask_region.value);
 
 			this.mesh_ocean = new THREE.Mesh(geometry, this.material_ocean);
 			TweenMax.to(this.material_ocean.uniforms.tt,10,{value:1, yoyo:true, repeat:-1});
@@ -238,19 +244,30 @@ export default{
 				var mb = arr[i];
 				dataToSendToGPU[baseIndex + 0] = mb.x/this.width;
 				dataToSendToGPU[baseIndex + 1] = mb.y/this.height;
-				dataToSendToGPU[baseIndex + 2] = mb.r/Math.min(this.width,this.height);
+				dataToSendToGPU[baseIndex + 2] = mb.r/Math.max(this.width,this.height);
 			}
 			return dataToSendToGPU;
 		},
 		resize:function(){
-			
-			this.material_ocean.uniforms.width.value=this.width;
-			this.material_ocean.uniforms.height.value=this.height;
-			this.material_taiwan.uniforms.width.value=this.width;
-			this.material_taiwan.uniforms.height.value=this.height;
+
+			console.log('ocean canvas shader resize!');
 
 			this.renderer.setSize(this.width,this.height);
 			this.renderer.render(this.scene,this.camera);
+			
+			this.material_ocean.uniforms.width.value=this.width;
+			this.material_ocean.uniforms.height.value=this.height;
+
+			this.material_taiwan.uniforms.width.value=this.width;
+			this.material_taiwan.uniforms.height.value=this.height;
+
+			let mask_region=this.$store.getters.getMaskRegion;
+			this.material_taiwan.uniforms.mask_region.value=new Float32Array([mask_region.x/this.width,
+																			mask_region.y/this.height,
+																			mask_region.w/this.width,
+																			mask_region.w/this.height]);
+			// console.log(this.material_taiwan.uniforms.mask_region.value);
+
 			// this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
 			// this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
 			for(var i=0;i<NUM_METABALLS;++i){
@@ -262,11 +279,11 @@ export default{
 						var index=i-NUM_METABALLS_TW;
 						let pos=this.$store.getters.getOceanPositionCanvas(index);
 						// console.log(pos);
-						this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL*.1,.25);
+						this.spots[i].setDest(pos.x,pos.y,TRANSITON_INTERVAL*.1,.25);
 					}else{
 						// var rad=.4;
 						let pos=this.$store.getters.getIslandPositionCanvas(i);
-						this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL*.1,pos.r);	
+						this.spots[i].setDest(pos.x,pos.y,TRANSITON_INTERVAL*.1,pos.r);	
 					}
 				}
 			}
@@ -283,16 +300,16 @@ export default{
 					var index=i-NUM_METABALLS_TW;
 					let pos=this.$store.getters.getOceanPositionCanvas(index);
 					// console.log(pos);
-					this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL,.25);
+					this.spots[i].setDest(pos.x,pos.y,TRANSITON_INTERVAL,.25);
 				}else{
 					// var rad=.4;
 					let pos=this.$store.getters.getIslandPositionCanvas(i);
-					this.spots[i].setDest(pos.x,this.height-pos.y,TRANSITON_INTERVAL,pos.r);	
+					this.spots[i].setDest(pos.x,pos.y,TRANSITON_INTERVAL,pos.r);	
 				}
 			}
 			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:10.0});
 
 			this.setShaderROI(.5,.5,1,1,TRANSITON_INTERVAL*.5,0);
 
@@ -305,7 +322,7 @@ export default{
 			}
 			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:1.0});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
 
 			this.setShaderROI(.5,.5,1,1,TRANSITON_INTERVAL*2,0);
 
@@ -328,7 +345,7 @@ export default{
 			// 	} 
 			// }	
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:1});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:2.0});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
 
 			// console.log('dest pos= '+this.spots[index].x+' , '+this.spots[index].y);
 			this.setShaderROI(this.spots[index].x/this.width,this.spots[index].y/this.height,.1,.1,TRANSITON_INTERVAL*.5,0);

@@ -17,12 +17,23 @@ new Vue({
 		clearTimeout(resize_timeout);
 		resize_timeout=setTimeout(_this.doResize,500);
 	};
+	this.doResize();
+  },
+  created(){
+	// this.doResize();
   },
   methods:{
 	doResize:function(){
 		console.log('resize!');
-		this.$store.state.screenWidth = document.documentElement.clientWidth;
-		this.$store.state.screenHeight = document.documentElement.clientHeight;
+		
+		// this.$store.state.screenWidth = document.documentElement.clientWidth;
+		// this.$store.state.screenHeight = document.documentElement.clientHeight;
+		// this.$store.state.pageWidth=this.$refs._map.clientWidth;
+		// this.$store.state.pageHeight=this.$refs._map.clientHeight;
+
+		this.$store.dispatch('computePageSize');
+
+		
 	}
   }
 

@@ -2,9 +2,17 @@
  <div id="app" class="FullScreen">   
     <ocean-canvas ref="_ocean_canvas"></ocean-canvas>   
     <PoemCanvas ref="_poem_canvas"></PoemCanvas> 
-    <keep-alive>
-      <router-view class="MainScreen"></router-view>
-    </keep-alive>
+    
+    <div id="_page" class="CenterWrapper">
+    <div class="MainScreen">
+    <transition name="page-fade">
+      <keep-alive>
+        <router-view class="MainPage"></router-view>
+      </keep-alive>
+    </transition>
+    </div>
+    </div>
+
   </div>
 </template>
 
@@ -19,6 +27,7 @@ export default{
     PoemCanvas
   },
   created:function(){
+    // this.$store.dispatch('computePageSize');
     this.$store.dispatch('fetchIslandData');
     this.$store.dispatch('fetchDummyChar');
   },
@@ -44,5 +53,24 @@ export default{
   text-align: center;
   // margin-top: 60px; 
   background:$ocean-blue;
+}
+#_page{
+  position: absolute;
+  top:0;
+  left:0;
+  right: 0;
+  bottom: 0;
+}
+.page-fade-enter-active,.page-fade-leave-active{
+  transition:all $page-transition-time ease;
+}
+.page-fade-enter-active{
+  transition-delay:$page-transition-time;
+}
+.page-fade-enter,.page-fade-leave-active{
+  opacity: 0;
+}
+.page-fade-enter-to,.page-fade-leave{
+  opacity: 1;
 }
 </style>

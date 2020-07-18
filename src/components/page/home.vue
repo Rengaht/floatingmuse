@@ -1,6 +1,6 @@
 <template>
-	<div class="CenterWrapper">
-		<div id="_title" @click="startClick"  class="CenterWrapper">
+	<div class="CenterWrapper" @click="startClick">
+		<div id="_title" class="CenterWrapper">
 			<!-- <TitleSvg/> -->
 			<WaveCanvas id="title" img_src="img/title.png" :ratio="0.65"></WaveCanvas>
 			<WaveCanvas class="HintRegion" id="hint1" img_src="img/hint-1.png" :ratio="0.32"></WaveCanvas>

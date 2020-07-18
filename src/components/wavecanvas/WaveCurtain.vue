@@ -1,5 +1,5 @@
 <template>
-	<div :id="id+'_curtain'" ref="_curtain">
+	<div :id="id+'_curtain'" ref="_curtain" class="WaveCanvas">
 		<div class="canvas" :id="id+'_canvas'"></div>
 		<div class="plane" :id="id+'_plane'">
 			<!-- <img src="../../assets/img/title-04.png"/> -->
@@ -112,10 +112,11 @@ export default{
 }
 
 </script>
-<style lang="scss" scoped>
-div{
+<style lang="scss">
+.WaveCanvas{
 	position: relative;
 	width:100%;
+	opacity: 1;
 	// height:1474 / 2282 * 100%;
 	// height:100%;
 	.canvas{

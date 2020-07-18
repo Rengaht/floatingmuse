@@ -1,29 +1,38 @@
 <template>
-<div id="_map" class="CenterWrapper">
+<div id="_map" class="CenterWrapper" ref="_map">
       <!-- <div class="HintRegion" id="_map_hint">
 		<div>你今天的心情<br>
 			想看看哪一片海？</div>
       </div> -->
 		<WaveCanvas id="hint2" img_src="img/hint-2.png" :ratio="0.3" class="HintRegion"></WaveCanvas> 
-       <ocean-item
-        v-for="item in ocean"
-        v-bind:ocean="item"
-        v-bind:key="item.name"
-        v-on:click.native="writePoem(item.index,item.name)"
-      >
-      </ocean-item>
+		<!-- <transition-group
+			name="ocean-item-list"
+			tag="div"
+			id="_map_wrapper"
+			v-bind:css="false"
+			v-on:before-enter="beforeEnter"
+			v-on:enter="enter"
+			v-on:leave="leave"> -->
+			<ocean-item
+				v-for="item in ocean"
+				v-bind:ocean="item"
+				v-bind:key="item.name"
+				v-on:click.native="writePoem(item.index,item.name)"
+			></ocean-item>
+		<!-- </transition-group> -->
 </div>
 </template>
 
 <script>
 import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
-
 import Vue from 'vue';
 import OceanItem from '../ocean/OceanItem.vue';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
 Vue.use(VueAxios,axios);
 
+// import gsap from 'gsap';
+// import {MOVE_INTERVAL} from '../ocean/OceanSpot.js';
 
 const CWBDataURL='https://opendata.cwb.gov.tw/fileapi/v1/opendataapi/F-A0012-001?Authorization=CWB-7021ACD5-3924-4A8B-8C5F-58BF57C9F18B&downloadType=WEB&format=JSON';
 
@@ -38,7 +47,8 @@ const ElementName={
 export default{
 	data(){
 		return{
-			ocean_list:[]			
+			ocean_list:[],
+			show:false,		
 		}
 	},
 	computed:{
@@ -49,7 +59,7 @@ export default{
 	},
 	components:{
 		OceanItem,
-		WaveCanvas
+		WaveCanvas,
 	},
 	methods:{
 		writePoem:function(index,name){
@@ -90,24 +100,92 @@ export default{
 			});
 
 			this.$parent.setStage('poem',parseInt(index));
-		}
+		},
+		beforeEnter: function (el) {
+			el.style.opacity = 0
+			el.style.height = 0
+		},
+		enter: function (el, done) {
+			// console.log('enter !');
+			// var delay = el.dataset.index;
+			// gsap.from(el,{
+			// 	opacity: 0,
+			// 	delay:delay,
+			// 	onComplete:done,
+			// });
+			el;
+			done;
+		},
+		leave: function (el, done) {
+			el;
+			done;
+			// console.log('leave !');
+			// var delay = el.dataset.index;
+			// gsap.to(el,{
+			// 	opacity: 0,
+			// 	delay:delay,
+			// 	onComplete:done,
+			// });
+		},
 	},
 	created:function(){
-
-	
 		console.log('map created');
-		let self=this;
-		Vue.axios.get(CWBDataURL).then(response=>{
-			var location=response.data.cwbopendata.dataset.location;
-			self.ocean_list=location;     
-		});   		
+			
+		// if(this.ocean_list.length<1){
+			let self=this;
+			Vue.axios.get(CWBDataURL).then(response=>{
+				var location=response.data.cwbopendata.dataset.location;
+				self.ocean_list=location;     
+			});   		
+		// }
+	},
+	mounted:function(){
+		this.$store.dispatch('computePageSize');
+		this.$parent.$refs._ocean_canvas.resize();
 	},
 	activated:function(){
-
-		this.$parent.setStage('island');				
 		
+		console.log('page map activated!');
+
+		this.$parent.setStage('island');		
+		// this.$store.dispatch('computePageSize');	
+		// this.$parent.$refs._ocean_canvas.resize();
+		// let self=this;
+		// setTimeout(function(){
+		// 	self.show=true;
+		// },1000);
+
+		// gsap.from('#hint2_curtain',{
+		// 	opacity:MOVE_INTERVAL/1000,
+		// 	repeat:0,
+		// });		
+		
+		// gsap.from('.OceanItem',{
+		// 	opacity:0,
+		// 	stagger:0.1,
+		// 	delay:MOVE_INTERVAL/1000*1.2,
+		// 	repeat:0,
+		// });		
     },
-  
+	deactivated:function(){
+
+		console.log('page map deactivated!');
+		// this.show=false;
+	// 	gsap.to('#hint2_curtain',{
+	// 		opacity:0,
+	// 		delay:0,
+	// 		repeat:0,
+	// 	});		
+		
+	// 	gsap.to('.OceanItem',{
+	// 		opacity:0,
+	// 		stagger:0.1,
+	// 		delay:MOVE_INTERVAL/1000*0.2,
+	// 		repeat:0,
+	// 	});		
+    }
+
+
 }
 
 
@@ -119,5 +197,12 @@ export default{
 }
 #_map{
 	align-items:flex-start;
+}
+#_map_wrapper{
+	position: absolute;
+	left:0;
+	top:0;
+	width: 100%;
+	height: 100%;
 }
 </style>

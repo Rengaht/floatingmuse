@@ -17,13 +17,20 @@ body{
 }
 .MainScreen{
 	position:absolute;
-	width:56.25vh;
-	left: calc((100% - 56.25vh)/2);
+	width:62.5vh;
+	max-width:100%;
+	height:100vh;
 	top:0;
 	bottom:0;
-	padding: $margin-size;
-	margin:0;
-	
+	// padding: $margin-size;
+	// margin:auto;
+}
+.MainPage{
+	position: absolute;
+	top:$margin-size;
+	bottom:$margin-size;
+	left:$margin-size;
+	right:$margin-size;
 }
 .CenterWrapper{
 	display: flex;
