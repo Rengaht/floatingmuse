@@ -15,7 +15,7 @@ const NUM_POEM_MAX=120;
 const WEATHER_COLOR="#E8FFD3";
 const POEM_COLOR="white";
 const POEM_PADDING=60;
-const CHAR_STAGGER_INTERVAL=200;
+const CHAR_STAGGER_INTERVAL=100;
 
 const POEM_DELAY_INTERVAL=5000;
 
@@ -92,7 +92,7 @@ export default{
 
 			// TODO: end dummy text
 			for(i in this.dummy_text){
-				this.dummy_text[i].reset();
+				this.dummy_text[i].fadeOut();
 			}
 
 			
@@ -150,7 +150,7 @@ export default{
 			//locy-=LINE_HEIGHT;
 			[index,locy,lastx]=this.addLine(index,date,locx-date.length*FONT_SIZE*.5,locy,destz,POEM_COLOR,0,weather_delay);
 
-
+			return [poem_delay,weather_delay];
 		},
 		addLine:function(index,text,startx,starty,destz,color,repeat,delay){
 			var t=0;

@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "curtainsjs": "^6.2.1",
     "gsap": "^3.3.3",
+    "howler": "^2.2.0",
     "postprocessing": "^6.16.0",
     "three": "^0.118.3",
     "vue": "^2.6.11",

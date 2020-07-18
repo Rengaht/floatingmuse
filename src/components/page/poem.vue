@@ -1,25 +1,12 @@
 <template>
 	<div>
-		<!-- <div id="_poem" class="CenterWrapper">		
-			<div class="PoemRegion">
-				<poem-item 
-					v-for="item in poem"
-					v-bind:poem="item"
-					v-bind:key="item.text"				
-				></poem-item>
-			</div>			
-		</div>
-		<div class="TitleRegion">
-			<div class="title">{{location}}</div>
-			<div class="title">{{date_str}}</div>
-		</div>	 -->
-		<div class="ButtonRegion">
-				<div class="Button" @click="rewriteClick">
-					<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
-				</div>
-				<div class="Button" @click="homeClick">
-					<WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas>
-				</div>
+		<div class="ButtonRegion" v-if="show_button">
+			<div class="Button" @click="rewriteClick">
+				<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
+			</div>
+			<div class="Button" @click="homeClick">
+				<WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas>
+			</div>
 		</div>
 	</div>
 </template>
@@ -30,11 +17,11 @@ import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 // import gsap from 'gsap';
 
 export default{		
-	// data:function(){
-	// 	return{
-	// 		date_str:new Date().toLocaleString()
-	// 	}
-	// },
+	data:function(){
+		return{
+			show_button:new Date().toLocaleString()
+		}
+	},
 	components:{
 		// PoemItem,
 		WaveCanvas,
@@ -42,8 +29,7 @@ export default{
 	watch:{
 		'$store.state.generating':function(val){
 			if(!val){
-				// console.log('finish generating!');
-				this.$parent.$refs['_poem_canvas'].addWeather(this.poem,this.location,this.date_str);
+				this.startPoem();
 			}
 		},
 	},
@@ -72,18 +58,46 @@ export default{
 	methods:{
 		rewriteClick:function(){	
 
-
-			this.date_str=new Date().toLocaleString();
+			this.show_button=false;
+			
+			this.$parent.$refs._poem_canvas.clear();
+			this.$parent.$refs._poem_canvas.resetChar();
+			
+			if(!this.$parent.sound_processing.playing()) this.$parent.sound_processing.play();
 			this.$store.dispatch('generatePoem');			
+
+			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
+			
 		},
 		homeClick:function(){
+
+			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
 			this.$router.push({name:'home'});
 		},
 		pad:function(n,width,z){
 			z = z || '0';
 			n = n + '';
 			return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
-		}
+		},
+		startPoem:function(){
+			
+			this.show_button=false;
+			var delay1_,delay2_;
+			[delay1_,delay2_]=this.$parent.$refs['_poem_canvas'].addWeather(this.poem,this.location,this.date_str);
+			this.$parent.sound_processing.stop();
+
+			this.$parent.sound_finish.play();
+
+			let sound=this.$parent.sound_fadein;
+			setTimeout(function(){
+				sound.play();
+			},delay1_);
+
+			// let show=this.show_button;
+			setTimeout(()=>this.show_button=true,delay2_);
+
+
+		},
 	},
 	created:function(){
 
@@ -97,6 +111,7 @@ export default{
 		//this.generatePoem();
 	},
 	activated:function(){
+		this.show_button=false;
 		//this.$parent.$refs['_poem_canvas'].addWeather(this.poem);
 	},
 	updated(){

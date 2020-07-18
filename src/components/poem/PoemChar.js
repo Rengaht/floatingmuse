@@ -1,7 +1,7 @@
 import {TweenMax,Sine} from 'gsap';
 import * as THREE from 'three';
 
-export const MOVE_INTERVAL=2000;
+export const MOVE_INTERVAL=1000;
 
 export const FONT_SIZE=30;
 export const LINE_HEIGHT=FONT_SIZE*1.5;
@@ -39,11 +39,11 @@ export default class PoemChar{
 
 		this.texture=new THREE.CanvasTexture(this.canvas);
 		this.texture.needsUpdate=true;
-		var material=new THREE.SpriteMaterial({map:this.texture,
+		this.material=new THREE.SpriteMaterial({map:this.texture,
 												color:0xffffff,
 												fog:true,
 												depthWrite:false,});
-		var sprite = new THREE.Sprite( material );
+		var sprite = new THREE.Sprite(this.material);
 
 		this.textObject = new THREE.Object3D();
 		// var sprite = new THREE.Sprite(texture);
@@ -102,8 +102,19 @@ export default class PoemChar{
 	}
 	restart(){
 		this.tween.restart();
+		this.fadeIn();
 	}
 	setRepeat(set_){
 		this.tween.repeat(set_);
+	}
+	fadeOut(){
+		TweenMax.to(this.material,2,{
+			opacity:0,
+		});
+	}
+	fadeIn(){
+		TweenMax.to(this.material,2,{
+			opacity:1,
+		});
 	}
 }

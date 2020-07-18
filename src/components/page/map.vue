@@ -76,6 +76,9 @@ export default{
 				console.log('err location: '+name);
 				return;
 			}
+
+			if(!this.$parent.sound_processing.playing()) this.$parent.sound_processing.play();
+
 			let self=this;
 			self.poem='waiting...'
 
@@ -100,6 +103,9 @@ export default{
 			});
 
 			this.$parent.setStage('poem',parseInt(index));
+
+			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
+			
 		},
 		beforeEnter: function (el) {
 			el.style.opacity = 0
@@ -148,6 +154,8 @@ export default{
 		console.log('page map activated!');
 
 		this.$parent.setStage('island');		
+
+			
 		// this.$store.dispatch('computePageSize');	
 		// this.$parent.$refs._ocean_canvas.resize();
 		// let self=this;

@@ -244,7 +244,7 @@ export default{
 				var mb = arr[i];
 				dataToSendToGPU[baseIndex + 0] = mb.x/this.width;
 				dataToSendToGPU[baseIndex + 1] = mb.y/this.height;
-				dataToSendToGPU[baseIndex + 2] = mb.r/Math.max(this.width,this.height);
+				dataToSendToGPU[baseIndex + 2] = mb.r/this.height;
 			}
 			return dataToSendToGPU;
 		},
@@ -345,7 +345,7 @@ export default{
 			// 	} 
 			// }	
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:1});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:8.0});
 
 			// console.log('dest pos= '+this.spots[index].x+' , '+this.spots[index].y);
 			this.setShaderROI(this.spots[index].x/this.width,this.spots[index].y/this.height,.1,.1,TRANSITON_INTERVAL*.5,0);

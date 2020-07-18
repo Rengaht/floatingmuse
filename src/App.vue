@@ -4,24 +4,32 @@
     <PoemCanvas ref="_poem_canvas"></PoemCanvas> 
     
     <div id="_page" class="CenterWrapper">
-    <div class="MainScreen">
-    <transition name="page-fade">
-      <keep-alive>
-        <router-view class="MainPage"></router-view>
-      </keep-alive>
-    </transition>
-    </div>
+      <div class="MainScreen">
+        <transition name="page-fade">
+          <keep-alive>
+            <router-view class="MainPage"></router-view>
+          </keep-alive>
+        </transition>
+      </div>
     </div>
 
   </div>
 </template>
 
 <script>
-
+import {Howl} from 'howler';
 import OceanCanvas from './components/ocean/OceanCanvas.vue';
 import PoemCanvas from './components/poem/PoemCanvas.vue';
 
 export default{
+  data(){
+    return{
+      sound_bgm:null,
+      sound_processing:null,
+      sound_fadein:null,
+      sound_finish:null,
+    };
+  },
   components:{
     OceanCanvas,
     PoemCanvas
@@ -30,6 +38,8 @@ export default{
     // this.$store.dispatch('computePageSize');
     this.$store.dispatch('fetchIslandData');
     this.$store.dispatch('fetchDummyChar');
+
+    this.loadSound();
   },
   methods:{
     setStage:function(set_,index){
@@ -37,8 +47,31 @@ export default{
         this.$refs._ocean_canvas.setStage(set_,index);
         this.$refs._poem_canvas.setStage(set_);
 
-    }
+        this.sound_fadein.stop();
+        this.sound_finish.stop();
+        if(set_!=='poem') this.sound_processing.stop();
+        
+    },
+    loadSound(){
+        this.sound_bgm=new Howl({
+          src:['audio/back.wav']
+        });
+        this.sound_bgm.loop(true);
 
+        this.sound_processing=new Howl({
+          src:['audio/processing.wav']
+        });
+        this.sound_processing.loop(true);
+
+        this.sound_fadein=new Howl({
+          src:['audio/fadein.wav']
+        });
+        // this.sound_fadein.rate(.8);
+        this.sound_finish=new Howl({
+          src:['audio/finish.wav']
+        });
+        
+    },
   }
 }
 </script>

@@ -114,8 +114,8 @@ const store=new Vuex.Store({
 
 			let mw=Math.min(state.pageWidth/0.8,state.pageHeight*IslandPortion);
 
-			let mx=state.screenWidth/2-mw/2*1.15;
-			let my=state.screenHeight/2-state.pageHeight/2+state.pageHeight-mw;
+			let mx=state.screenWidth/2-mw/2;
+			let my=state.screenHeight/2-state.pageHeight/2+state.pageHeight*.2;//-mw;
 			
 			// console.log(mx+" "+my+" "+mw);
 

@@ -33,6 +33,7 @@ export default {
     methods:{
 		startClick:function(){
 			this.$router.push('map');
+			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
 			// this.$parent.$refs['_ocean_canvas'].goIsland();				
 		
 		},
