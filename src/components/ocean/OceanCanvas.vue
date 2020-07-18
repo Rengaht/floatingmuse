@@ -252,8 +252,6 @@ export default{
 
 			console.log('ocean canvas shader resize!');
 
-			this.renderer.setSize(this.width,this.height);
-			this.renderer.render(this.scene,this.camera);
 			
 			this.material_ocean.uniforms.width.value=this.width;
 			this.material_ocean.uniforms.height.value=this.height;
@@ -287,6 +285,23 @@ export default{
 					}
 				}
 			}
+
+			
+			var aspect = this.width/this.height;
+			var vFov = this.camera.fov * Math.PI / 180;
+			var planeHeight = 2 * Math.tan(vFov / 2);
+			var planeWidth = planeHeight * aspect;
+			var geometry =new THREE.PlaneBufferGeometry(planeWidth,planeHeight,1,1);
+			
+			this.camera.aspect = aspect;
+			this.camera.updateProjectionMatrix();
+
+			this.mesh_ocean.geometry=geometry;
+			this.mesh_taiwan.geometry=geometry;
+
+			this.renderer.setSize(this.width,this.height);
+			this.renderer.render(this.scene,this.camera);
+			
 		},
 		goIsland:function(){
 

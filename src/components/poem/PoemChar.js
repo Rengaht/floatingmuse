@@ -108,13 +108,14 @@ export default class PoemChar{
 		this.tween.repeat(set_);
 	}
 	fadeOut(){
-		TweenMax.to(this.material,2,{
+		TweenMax.to(this.material,3,{
 			opacity:0,
 		});
 	}
 	fadeIn(){
-		TweenMax.to(this.material,2,{
+		TweenMax.to(this.material,3,{
 			opacity:1,
+			delay:1,
 		});
 	}
 }

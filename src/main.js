@@ -15,7 +15,7 @@ new Vue({
 	var _this = this;
 	window.onresize=function(){
 		clearTimeout(resize_timeout);
-		resize_timeout=setTimeout(_this.doResize,500);
+		resize_timeout=setTimeout(_this.doResize,10);
 	};
 	this.doResize();
   },
@@ -33,7 +33,7 @@ new Vue({
 
 		this.$store.dispatch('computePageSize');
 
-		
+
 	}
   }
 

@@ -75,8 +75,11 @@ export default{
 		},
 		resize:function(){
 			
+			this.camera.aspect = window.innerWidth / window.innerHeight;
+			this.camera.updateProjectionMatrix();
+
 			this.renderer.setSize(this.width,this.height);
-			this.renderer.render(this.scene,this.camera);
+			if(this.state==='poem') this.renderer.render(this.scene,this.camera);
 		
 		},
 		animate:function(){
