@@ -1,4 +1,13 @@
 import Vue from 'vue';
+
+import VueMeta from 'vue-meta';
+Vue.use(VueMeta);
+
+import VueAnalytics from 'vue-analytics'
+Vue.use(VueAnalytics, {
+  id: 'UA-80306203-11'
+})
+
 import App from './App.vue';
 Vue.config.productionTip = false;
 

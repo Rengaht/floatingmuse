@@ -49,6 +49,7 @@ export default{
 		return{
 			ocean_list:[],
 			show:false,		
+			sleeptimeout:null,
 		}
 	},
 	computed:{
@@ -148,6 +149,12 @@ export default{
 	mounted:function(){
 		this.$store.dispatch('computePageSize');
 		this.$parent.$refs._ocean_canvas.resize();
+
+		clearTimeout(this.sleeptimeout);
+		this.sleeptimeout=setTimeout(()=>{
+			this.$router.push({name:'home'});
+			console.log('timeout!');
+		},this.$store.state.timeoutInterval);
 	},
 	activated:function(){
 		
@@ -155,7 +162,11 @@ export default{
 
 		this.$parent.setStage('island');		
 
-			
+		clearTimeout(this.sleeptimeout);
+		this.sleeptimeout=setTimeout(()=>{
+			this.$router.push({name:'home'});
+			console.log('timeout!');
+		},this.$store.state.timeoutInterval);
 		// this.$store.dispatch('computePageSize');	
 		// this.$parent.$refs._ocean_canvas.resize();
 		// let self=this;
@@ -178,6 +189,7 @@ export default{
 	deactivated:function(){
 
 		console.log('page map deactivated!');
+		clearTimeout(this.sleeptimeout);
 		// this.show=false;
 	// 	gsap.to('#hint2_curtain',{
 	// 		opacity:0,

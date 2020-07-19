@@ -19,7 +19,8 @@ import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 export default{		
 	data:function(){
 		return{
-			show_button:new Date().toLocaleString()
+			show_button:new Date().toLocaleString(),
+			sleeptimeout:null,
 		}
 	},
 	components:{
@@ -94,7 +95,14 @@ export default{
 			},delay1_);
 
 			// let show=this.show_button;
-			setTimeout(()=>this.show_button=true,delay2_);
+			setTimeout(()=>{
+				this.show_button=true;
+				clearTimeout(this.sleeptimeout);
+				this.sleeptimeout=setTimeout(()=>{
+					this.$router.push({name:'home'});
+					console.log('timeout!');
+				},this.$store.state.timeoutInterval+delay2_);
+			},delay2_);
 
 
 		},
@@ -110,8 +118,18 @@ export default{
 		// this.poem=this.text.join('\n');
 		//this.generatePoem();
 	},
+	mounted:function(){
+
+		if(!this.generating){
+			this.$router.push({name:'home'});
+		}
+	},
 	activated:function(){
 		this.show_button=false;
+
+		if(!this.generating){
+			this.$router.push({name:'home'});
+		}
 		//this.$parent.$refs['_poem_canvas'].addWeather(this.poem);
 	},
 	updated(){
@@ -120,6 +138,9 @@ export default{
 		// 	opacity:0,
 		// 	stagger:0.1
 		// });
+	},
+	deactivated:function(){
+		clearTimeout(this.sleeptimeout);
 	}
 }
 

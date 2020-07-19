@@ -26,7 +26,7 @@ const store=new Vuex.Store({
 	state:{
 		location:'',
 		poem:[],
-		generating:true,
+		generating:false,
 		ocean:[],
 		island:[],
 		screenWidth:document.documentElement.clientWidth,
@@ -36,6 +36,7 @@ const store=new Vuex.Store({
 		maskRegion:{},
 		pagePadding:PagePadding,
 		dummyChar:[],
+		timeoutInterval:30000,
 	},
 	mutations:{
 		setWeatherText(state,set){
@@ -273,6 +274,9 @@ const store=new Vuex.Store({
 		},
 		getMaskRegion:function(state){
 			return state.maskRegion;
+		},
+		getSleepTimeout:function(state){
+			return state.timeoutInterval;
 		},
 	}
 

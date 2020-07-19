@@ -45,7 +45,9 @@ export default{
 
 			let planeElement=document.getElementById(this.$props.id+"_plane");
 			let curtainElement=document.getElementById(this.$props.id+"_curtain");
-			curtainElement.style.height=ratio*curtainElement.clientWidth+'px';
+
+			if(curtainElement)
+				curtainElement.style.height=ratio*curtainElement.clientWidth+'px';
 			// console.log(curtainElement.style.height);
 
 			this.curtains=new Curtains({container:this.$props.id+"_canvas",
@@ -86,9 +88,10 @@ export default{
 			// 		this.plane.uniforms.time.value++;
 			// 	});
 			// }
-			curtainElement.getElementsByTagName('canvas')[0].style.width='100%';
-			curtainElement.getElementsByTagName('canvas')[0].style.height='unset';
-
+			if(curtainElement){
+				curtainElement.getElementsByTagName('canvas')[0].style.width='100%';
+				curtainElement.getElementsByTagName('canvas')[0].style.height='unset';
+			}
 			this.lastPoint=[Math.random(),Math.random()];
 			this.draw();
 
