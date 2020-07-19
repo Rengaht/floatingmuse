@@ -39,6 +39,9 @@ export default{
 	mounted:function(){
 		this.init(this.$props.ratio);
 	},
+	activated:function(){
+		this.resize();
+	},
 	methods:{
 		init:function(ratio){
 			// console.log('init curtain');
@@ -98,6 +101,7 @@ export default{
 		},
 		resize:function(){
 			this.$refs._curtain.style.height=this.$refs._curtain.clientWidth*this.$props.ratio+'px';
+			// console.log(this.$props.id+' wave resize= '+this.$refs._curtain.style.height);
 		},
 		draw:function(){
 			// if(this.plane) this.plane.uniforms.time.value++;

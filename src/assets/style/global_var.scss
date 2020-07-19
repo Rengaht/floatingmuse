@@ -1,3 +1,25 @@
+@mixin pad{
+  @media(max-width:768px){
+    @content;
+  }
+}
+@mixin mobile{
+  @media(max-width:375px){
+    @content;
+  }
+}
+html{
+	font-size:18px;
+
+	@include pad{
+		font-size:14px;
+	}
+	@include mobile{
+		font-size:10px;
+	}
+
+}
+
 $header-color:gray;
 $hint-size:1.85rem;
 

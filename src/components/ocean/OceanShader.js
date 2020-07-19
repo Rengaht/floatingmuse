@@ -18,9 +18,11 @@ export const fs=`
     uniform vec3 metaballs[` + NUM_METABALLS + `];
     uniform vec3 ocean_color[4];
     uniform float tt;
+    
     uniform float width;
     uniform float height;
     uniform float layer;
+    
     uniform float roi_pos_x;
     uniform float roi_pos_y;
     uniform float roi_size_x;
@@ -48,6 +50,24 @@ export const fs=`
 
         return vec2(rx,ry);
     }
+    vec4 getBlobColor(float val){
+        float step=val/5.0;
+        float pp=step-floor(step);
+        
+        vec4 bcolor;
+
+        pp=1.0;//-pp;
+        if(step>=layer*2.5) bcolor = vec4(ocean_color[0], 1.0);
+        else if(step>=layer*2.0) bcolor = vec4(mix(ocean_color[0],ocean_color[1],pp), 1.0);
+        else if(step>=layer*1.5) bcolor = vec4(mix(ocean_color[1],ocean_color[2],pp),1.0);
+        else if(step>=layer){
+            bcolor = vec4(mix(ocean_color[2],ocean_color[3],pp), 1.0);  
+        }else{
+            bcolor = vec4(ocean_color[3], 0.0);
+        }
+        return bcolor;
+    }
+   
     void main(){
         float ratio=width/height;
         vec2 p=mapCoord(vUv.xy);
@@ -57,7 +77,7 @@ export const fs=`
         float mx=x*ratio;
         float my=y;
         
-        float curve=20.0+layer*2.0;
+        float curve=20.0+layer*5.0;
         
         float v = 0.0;
         float d=0.0;
@@ -68,7 +88,7 @@ export const fs=`
             float r = mb.z;
             v += r*r/(dx*dx + dy*dy);
             // v += r*r/(dx*dx + dy*dy);
-            // d+=1.0/(dx*dx+dy*dy);
+            d+=1.0/(dx*dx+dy*dy);
 
             // if(mod(sqrt(d)*width,1.0)<0.01){
             //     gl_FragColor=vec4(BORDER_COLOR,1.0);
@@ -76,22 +96,13 @@ export const fs=`
             // }
         }
         v=v*(noise(vec2(x*ratio*curve+tt,y*curve+tt))*.5+.5);
-        // d=d*noise(vec2(x*ratio*curve+tt,y*curve+tt)*.5+.5);
-        if(mod(sqrt(v)*width,0.5)<0.01) gl_FragColor=vec4(BORDER_COLOR,1.0);
+        d=d*noise(vec2(x*ratio*curve/5.0+tt,y*curve/5.0+tt)*.5+.5);
+        vec4 tmp;
+        if(mod(sqrt(d),0.5)<0.01) tmp=vec4(BORDER_COLOR,1.0);
         else{
-            // if (v > 1.0) {
-                float step=v;
-                float pp=step-floor(step);
-                pp=1.0;//-pp;
-                if(step>=layer*2.5) gl_FragColor = vec4(ocean_color[0], 1.0);
-                else if(step>=layer*2.0) gl_FragColor = vec4(mix(ocean_color[0],ocean_color[1],pp), 1.0);
-                else if(step>=layer*1.5) gl_FragColor = vec4(mix(ocean_color[1],ocean_color[2],pp),1.0);
-                else if(step>=layer){
-                    gl_FragColor = vec4(mix(ocean_color[2],ocean_color[3],pp), 1.0);  
-                }else{
-                    gl_FragColor = vec4(ocean_color[3], 0.0);
-                }
+            tmp=getBlobColor(v);
         }
+        gl_FragColor=tmp;
     }
     `;
 export const fs_tw=`
@@ -127,13 +138,6 @@ export const fs_tw=`
     }
     bool inMask(vec2 p){
         
-        // if(p.y>ISLAND_CENTER+ISLAND_PORTION || p.y<ISLAND_CENTER-ISLAND_PORTION) return false;
-
-        // float ratio=width/height;
-        // float my=(p.y-ISLAND_CENTER)*1.0/ISLAND_PORTION/2.0+.5;
-        
-        // float mx=(p.x-.5)*1.0/ISLAND_PORTION/2.0+.5;
-
         if(p.x<mask_region[0] || p.y<mask_region[1] 
             || p.x>mask_region[0]+mask_region[2] || p.y>mask_region[1]+mask_region[3]) return false;
 
@@ -176,7 +180,7 @@ export const fs_tw=`
         bool in_mask=inMask(p);
         vec4 tmp=vec4(ocean_color[3],.2);
         vec4 dest=vec4(mix(ISLAND_COLOR[2],ISLAND_COLOR[3],y),tt);
-        if(v > 1.0){
+        // if(v > 1.0){
             tmp=vec4(ocean_color[3], .2);
             float step=floor(v/4.0);
             float pp=1.0;
@@ -185,7 +189,7 @@ export const fs_tw=`
             else if(step>=4.0) tmp =vec4(ocean_color[2], 1.0);
 
             // if(tt>0.0 && !in_mask) tmp=vec4(ocean_color[3],.2);
-        }
+        // }
         if(in_mask){
             dest=vec4(mix(ISLAND_COLOR[0],ISLAND_COLOR[1],y),1.0);
         }

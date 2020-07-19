@@ -1,6 +1,6 @@
 import {TweenMax,Sine} from 'gsap';
 
-const RADIUS_PORTION=0.8;
+const RADIUS_PORTION=0.5;
 // const SPOT_VEL=5;
 // const DEST_TOLERANCE=20;
 export const MOVE_INTERVAL=5000;

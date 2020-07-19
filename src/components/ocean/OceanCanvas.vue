@@ -63,6 +63,8 @@ export default{
 				this.spots.push(spot);
 
 			}
+			let mask_region=this.$store.getters.getMaskRegion;
+			
 
 			this.material_ocean=new THREE.ShaderMaterial({
 				uniforms:{
@@ -80,10 +82,10 @@ export default{
 						value:0
 					},
 					width:{
-						value:planeWidth
+						value:this.width
 					},
 					height:{
-						value:planeHeight
+						value:this.height
 					},
 					layer:{
 						value:5.0
@@ -107,7 +109,6 @@ export default{
 			});
 
 
-			let mask_region=this.$store.getters.getMaskRegion;
 			// console.log(mask_region);
 
 			this.material_taiwan=new THREE.ShaderMaterial({
@@ -168,7 +169,7 @@ export default{
 			// console.log(this.material_taiwan.uniforms.mask_region.value);
 
 			this.mesh_ocean = new THREE.Mesh(geometry, this.material_ocean);
-			TweenMax.to(this.material_ocean.uniforms.tt,10,{value:1, yoyo:true, repeat:-1});
+			TweenMax.to(this.material_ocean.uniforms.tt,6,{value:10, yoyo:true, repeat:-1});
 
 			this.mesh_taiwan= new THREE.Mesh(geometry, this.material_taiwan);
 			
@@ -256,8 +257,8 @@ export default{
 			this.material_ocean.uniforms.width.value=this.width;
 			this.material_ocean.uniforms.height.value=this.height;
 
-			this.material_taiwan.uniforms.width.value=this.width;
-			this.material_taiwan.uniforms.height.value=this.height;
+			// this.material_taiwan.uniforms.width.value=this.width;
+			// this.material_taiwan.uniforms.height.value=this.height;
 
 			let mask_region=this.$store.getters.getMaskRegion;
 			this.material_taiwan.uniforms.mask_region.value=new Float32Array([mask_region.x/this.width,
@@ -324,7 +325,9 @@ export default{
 			}
 			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:10.0});
+			// TweenMax.to(this.material_ocean.uniforms.mask_tt,TRANSITON_INTERVAL/1000.0*.5,{value:1,delay:TRANSITON_INTERVAL/1000*0.5});
+			
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
 
 			this.setShaderROI(.5,.5,1,1,TRANSITON_INTERVAL*.5,0);
 
@@ -337,7 +340,7 @@ export default{
 			}
 			
 			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:0});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:5.0});
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:1.0});
 
 			this.setShaderROI(.5,.5,1,1,TRANSITON_INTERVAL*2,0);
 
@@ -359,8 +362,10 @@ export default{
 			// 							this.height*(.5+rad*Math.cos(ang)),TRANSITON_INTERVAL);	
 			// 	} 
 			// }	
-			TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:1});
-			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:8.0});
+			// TweenMax.to(this.material_taiwan.uniforms.tt,TRANSITON_INTERVAL/1000.0,{value:1});
+			TweenMax.to(this.material_taiwan.uniforms.mask_tt,TRANSITON_INTERVAL/1000.0,{value:1});
+			
+			TweenMax.to(this.material_ocean.uniforms.layer,TRANSITON_INTERVAL/1000.0,{value:4.0});
 
 			// console.log('dest pos= '+this.spots[index].x+' , '+this.spots[index].y);
 			this.setShaderROI(this.spots[index].x/this.width,this.spots[index].y/this.height,.1,.1,TRANSITON_INTERVAL*.5,0);
