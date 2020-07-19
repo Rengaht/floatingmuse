@@ -14,7 +14,7 @@ const NUM_CHAR=50;
 const NUM_POEM_MAX=120;
 const WEATHER_COLOR="#E8FFD3";
 const POEM_COLOR="white";
-const POEM_PADDING=60;
+// const POEM_PADDING=60;
 const CHAR_STAGGER_INTERVAL=100;
 
 const POEM_DELAY_INTERVAL=5000;
@@ -33,16 +33,18 @@ export default{
 			cameraZ:2000,
 			stage:'floating',
 			author:'漂浮繆斯',
+			poem_group:new THREE.Group(),
 		}
 	},
 	computed:{
 		textwidth:function(){
-			return Math.min(this.width,this.height*0.625);
+			// return Math.min(this.width,this.height*0.625);
+			return this.$store.state.pageWidth;
 		},
 		destZ:function(){
 			var vFov=this.camera.fov*Math.PI/180;
 			return this.height/(2*Math.tan(vFov/2));
-		}
+		},
 	},
 	watch:{
 		'$store.state.screenWidth':function(val){
@@ -61,7 +63,7 @@ export default{
 			this.camera.position.z = 0;
 
 			this.scene = new THREE.Scene();
-
+			this.scene.add(this.poem_group);
 		
 			
 			this.renderer = new THREE.WebGLRenderer({antialias: true, alpha:true});
@@ -106,11 +108,15 @@ export default{
 				if(arr[i].concat) len-=1;
 			}
 			console.log('#line= '+len);
-			let startx=-(this.textwidth/2-POEM_PADDING);//(this.width/this.height)/2;
-			let starty=LINE_HEIGHT*(len+5)/2;
+
+
+			
+			let startx=0;//-(this.textwidth/2);//(this.width/this.height)/2;
+			let starty=0;//LINE_HEIGHT*(len+5)/2;
 			// let t=0;
 			let index=0;
 			let lastx=0;
+			let maxLineWidth=0;
 				
 			let destz=this.camera.position.z-this.destZ;
 			let poem_delay=POEM_DELAY_INTERVAL;
@@ -130,28 +136,42 @@ export default{
 													starty,
 													destz,
 													POEM_COLOR,0,poem_delay);
+						maxLineWidth=Math.max(maxLineWidth,lastx);
 					}else{
 						[index,starty,lastx]=this.addLine(index,poem[k],
 													startx,
 													starty,
 													destz,
 													POEM_COLOR,0,poem_delay);
+						maxLineWidth=Math.max(maxLineWidth,lastx);
 					}
 				}
 			}
 			
 			let weather_delay=POEM_DELAY_INTERVAL+MOVE_INTERVAL;
 			
-			let locx=this.textwidth/2-POEM_PADDING;
+			let locx=maxLineWidth;
 			let locy=starty-LINE_HEIGHT;
 
 			[index,locy,lastx]=this.addLine(index,this.author,locx-this.author.length*FONT_SIZE,locy,destz,POEM_COLOR,0,weather_delay);
+			maxLineWidth=Math.max(maxLineWidth,lastx);
 			
 			locy-=LINE_HEIGHT;
 			[index,locy,lastx]=this.addLine(index,loc,locx-loc.length*FONT_SIZE,locy,destz,POEM_COLOR,0,weather_delay);
+			maxLineWidth=Math.max(maxLineWidth,lastx);
 
 			//locy-=LINE_HEIGHT;
 			[index,locy,lastx]=this.addLine(index,date,locx-date.length*FONT_SIZE*.5,locy,destz,POEM_COLOR,0,weather_delay);
+			maxLineWidth=Math.max(maxLineWidth,lastx);
+
+			let scale_=Math.min(this.textwidth/(maxLineWidth-startx),this.$store.state.pageHeight*.8/Math.abs(locy));
+			// console.log('scale= '+scale_);
+			scale_=Math.min(1,scale_);
+			
+			this.poem_group.scale.set(scale_,scale_,1);
+			this.poem_group.position.x=-maxLineWidth/2*scale_;
+			this.poem_group.position.y=-locy/2*scale_;
+
 
 			return [poem_delay,weather_delay];
 		},
@@ -161,11 +181,11 @@ export default{
 			var lasty=starty;
 			for(var k in text){
 				
-				if(lastx+startx>=this.textwidth/2-POEM_PADDING){
-					lastx=0;
-					startx=-this.textwidth/2+POEM_PADDING;
-					lasty-=LINE_HEIGHT;
-				}
+				// if(lastx+startx>=this.textwidth/2-POEM_PADDING){
+				// 	lastx=0;
+				// 	startx=-this.textwidth/2+POEM_PADDING;
+				// 	lasty-=LINE_HEIGHT;
+				// }
 
 				lastx+=FONT_SIZE*(this.isASCII(text[k])?-.25:0);
 
@@ -217,11 +237,14 @@ export default{
 			// text.position.y=Math.random()*this.height-this.height/2;
 			// text.position.z=-Math.random()*100;
 
-			if(repeat==-1) this.dummy_text.push(pchar);
-			else this.poem_text.push(pchar);
-
+			if(repeat==-1){
+				this.dummy_text.push(pchar);
+				this.scene.add(pchar.textObject);
+			}else{
+				this.poem_text.push(pchar);
+				this.poem_group.add(pchar.textObject);
+			}
 			
-			this.scene.add(pchar.textObject);
 		},
 		isASCII: function(str){
 			// var t=/^\w+$/.test(str);

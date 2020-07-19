@@ -64,7 +64,7 @@ export default{
 	},
 	methods:{
 		writePoem:function(index,name){
-
+			
 			var item;
 			for(var k in this.ocean_list){
 				if(this.ocean_list[k].locationName===name){
@@ -106,7 +106,7 @@ export default{
 			this.$parent.setStage('poem',parseInt(index));
 
 			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
-			
+			clearTimeout(this.sleeptimeout);
 		},
 		beforeEnter: function (el) {
 			el.style.opacity = 0

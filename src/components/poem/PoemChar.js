@@ -1,7 +1,7 @@
 import {TweenMax,Sine} from 'gsap';
 import * as THREE from 'three';
 
-export const MOVE_INTERVAL=1000;
+export const MOVE_INTERVAL=2000;
 
 export const FONT_SIZE=30;
 export const LINE_HEIGHT=FONT_SIZE*1.5;

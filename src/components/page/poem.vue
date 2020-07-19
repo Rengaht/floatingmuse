@@ -68,7 +68,7 @@ export default{
 			this.$store.dispatch('generatePoem');			
 
 			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
-			
+			clearTimeout(this.sleeptimeout);
 		},
 		homeClick:function(){
 
