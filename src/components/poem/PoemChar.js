@@ -39,6 +39,7 @@ export default class PoemChar{
 
 		this.texture=new THREE.CanvasTexture(this.canvas);
 		this.texture.needsUpdate=true;
+		this.texture.minFilter = THREE.LinearFilter;
 		this.material=new THREE.SpriteMaterial({map:this.texture,
 												color:0xffffff,
 												fog:true,

@@ -1,20 +1,22 @@
 <template>
 	<div>
-		<div class="ButtonRegion" v-if="show_button">
-			<div class="Button" @click="rewriteClick">
-				<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
+		<keep-alive>
+			<div class="ButtonRegion" :style="show_button?'display:block;':'display:none;'">
+				<div class="Button" @click="rewriteClick">
+					<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
+				</div>
+				<div class="Button" @click="homeClick">
+					<WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas>
+				</div>
 			</div>
-			<div class="Button" @click="homeClick">
-				<WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas>
-			</div>
-		</div>
+		</keep-alive>
 	</div>
 </template>
 
 <script>
 import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 // import PoemItem from '../poem/PoemItem.vue';
-// import gsap from 'gsap';
+import gsap from 'gsap';
 
 export default{		
 	data:function(){
@@ -97,6 +99,13 @@ export default{
 			// let show=this.show_button;
 			setTimeout(()=>{
 				this.show_button=true;
+
+				gsap.from(".ButtonRegion",{
+					opacity:0,
+					duration:1,
+				});
+
+
 				clearTimeout(this.sleeptimeout);
 				this.sleeptimeout=setTimeout(()=>{
 					this.$router.push({name:'home'});

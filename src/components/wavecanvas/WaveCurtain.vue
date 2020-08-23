@@ -42,9 +42,14 @@ export default{
 	activated:function(){
 		this.resize();
 	},
+	deactivated:function(){
+		console.log('curtain deactivated!');
+	},
 	methods:{
 		init:function(ratio){
-			// console.log('init curtain');
+			if(this.curtains) return;
+			
+			console.log('init curtain');
 
 			let planeElement=document.getElementById(this.$props.id+"_plane");
 			let curtainElement=document.getElementById(this.$props.id+"_curtain");
@@ -53,9 +58,10 @@ export default{
 				curtainElement.style.height=ratio*curtainElement.clientWidth+'px';
 			// console.log(curtainElement.style.height);
 
+
 			this.curtains=new Curtains({container:this.$props.id+"_canvas",
-										production:true,
-										autoResize:false});
+											production:true,
+											autoResize:false});
 			
 			let params={
 				vertexShader: vs, // our vertex shader ID

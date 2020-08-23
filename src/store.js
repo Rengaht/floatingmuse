@@ -36,7 +36,7 @@ const store=new Vuex.Store({
 		maskRegion:{},
 		pagePadding:PagePadding,
 		dummyChar:[],
-		timeoutInterval:30000,
+		timeoutInterval:60000,
 	},
 	mutations:{
 		setWeatherText(state,set){

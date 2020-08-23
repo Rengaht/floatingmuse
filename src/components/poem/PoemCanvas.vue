@@ -291,6 +291,8 @@ export default{
 		
 	},
 	mounted(){
+		console.log('wave canvas mounted!');
+
 		this.init();
 		for(var i=0;i<NUM_CHAR;++i) this.insertChar(this.$store.getters.getDummyChar(i));
 		for(i=0;i<NUM_POEM_MAX*2;++i) this.insertChar('A',0,0,0,WEATHER_COLOR,0,0);
