@@ -141,7 +141,7 @@ const store=new Vuex.Store({
 			Vue.axios.post(PoemURL,weather_text)
 			.then(res=>{
 
-				// console.log('res=> ',res);
+				console.log('res=> ',res);
 				var poem_=res.data.split('#');
 
 				commit('setPoem',poem_);				

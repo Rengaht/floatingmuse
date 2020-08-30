@@ -44,6 +44,7 @@ export default{
   methods:{
     setStage:function(set_,index){
 
+        // index;
         this.$refs._ocean_canvas.setStage(set_,index);
         this.$refs._poem_canvas.setStage(set_);
 

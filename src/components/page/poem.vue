@@ -1,12 +1,15 @@
 <template>
 	<div>
 		<keep-alive>
+			<!-- <div class="ButtonRegion" :style="show_button?'display:block;':'display:none;'" -->
 			<div class="ButtonRegion" :style="show_button?'display:block;':'display:none;'">
 				<div class="Button" @click="rewriteClick">
-					<WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas>
+					<img src="img/hint-3.png" id="hint3"/>
+					<!-- <WaveCanvas id="hint3" img_src="img/hint-3.png" :ratio="0.42" ></WaveCanvas> -->
 				</div>
 				<div class="Button" @click="homeClick">
-					<WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas>
+					<img src="img/hint-4.png" id="hint4"/>
+					<!-- <WaveCanvas id="hint4" img_src="img/hint-4.png" :ratio="0.42"></WaveCanvas> -->
 				</div>
 			</div>
 		</keep-alive>
@@ -14,7 +17,7 @@
 </template>
 
 <script>
-import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
+// import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 // import PoemItem from '../poem/PoemItem.vue';
 import gsap from 'gsap';
 
@@ -27,7 +30,7 @@ export default{
 	},
 	components:{
 		// PoemItem,
-		WaveCanvas,
+		// WaveCanvas,
 	},
 	watch:{
 		'$store.state.generating':function(val){
@@ -46,7 +49,7 @@ export default{
 			// var mm=today.getMiniute();
 			// var ss=today.getSecond();
 
-			return today.getFullYear()+'/'+this.pad(m,2)+'/'+this.pad(d,2);
+			return today.getFullYear()+'/'+this.pad(m+1,2)+'/'+this.pad(d,2);
 		},
 		location:function(){
 			return this.$store.state.location;
@@ -66,7 +69,7 @@ export default{
 			this.$parent.$refs._poem_canvas.clear();
 			this.$parent.$refs._poem_canvas.resetChar();
 			
-			if(!this.$parent.sound_processing.playing()) this.$parent.sound_processing.play();
+			// if(!this.$parent.sound_processing.playing()) this.$parent.sound_processing.play();
 			this.$store.dispatch('generatePoem');			
 
 			if(!this.$parent.sound_bgm.playing()) this.$parent.sound_bgm.play();
@@ -87,6 +90,7 @@ export default{
 			this.show_button=false;
 			var delay1_,delay2_;
 			[delay1_,delay2_]=this.$parent.$refs['_poem_canvas'].addWeather(this.poem,this.location,this.date_str);
+			//delay1_;
 			this.$parent.sound_processing.stop();
 
 			this.$parent.sound_finish.play();
@@ -108,10 +112,11 @@ export default{
 
 				clearTimeout(this.sleeptimeout);
 				this.sleeptimeout=setTimeout(()=>{
+
 					this.$router.push({name:'home'});
 					console.log('timeout!');
 				},this.$store.state.timeoutInterval+delay2_);
-			},delay2_);
+			},delay2_+3000);
 
 
 		},
@@ -189,6 +194,10 @@ export default{
 
 		$all_pad:$margin-size*2;
 		width: calc((100% - #{$all_pad})/2);
+
+		img{
+			width: 100%;
+		}
 	}
 }
 

@@ -1,10 +1,10 @@
 <template>
 <div id="_map" class="CenterWrapper" ref="_map">
-      <!-- <div class="HintRegion" id="_map_hint">
+      <div class="HintRegion" id="_map_hint">
 		<div>你今天的心情<br>
 			想看看哪一片海？</div>
-      </div> -->
-		<WaveCanvas id="hint2" img_src="img/hint-2.png" :ratio="0.3" class="HintRegion"></WaveCanvas> 
+      </div>
+		<!-- <WaveCanvas id="hint2" img_src="img/hint-2.png" :ratio="0.3" class="HintRegion"></WaveCanvas>  -->
 		<!-- <transition-group
 			name="ocean-item-list"
 			tag="div"
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
+// import WaveCanvas from "../wavecanvas/WaveCurtain.vue";
 import Vue from 'vue';
 import OceanItem from '../ocean/OceanItem.vue';
 import axios from 'axios';
@@ -60,7 +60,7 @@ export default{
 	},
 	components:{
 		OceanItem,
-		WaveCanvas,
+		// WaveCanvas,
 	},
 	methods:{
 		writePoem:function(index,name){

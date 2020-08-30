@@ -77,7 +77,7 @@ export const fs=`
         float mx=x*ratio;
         float my=y;
         
-        float curve=20.0+layer*5.0;
+        float curve=40.0+layer*20.0;
         
         float v = 0.0;
         float d=0.0;

@@ -33,7 +33,18 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
   <body>   
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-80306203-11"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-80306203-11');
+    </script>
+
     <div id="app"></div>
     <!-- built files will be auto injected -->
+
   </body>
 </html>

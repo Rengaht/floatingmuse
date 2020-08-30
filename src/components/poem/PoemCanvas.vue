@@ -7,11 +7,11 @@
 import * as THREE from 'three';
 import PoemChar from './PoemChar.js';
 import {FONT_SIZE,LINE_HEIGHT,MOVE_INTERVAL} from './PoemChar.js';
-
+import {gsap,Sine} from 'gsap';
  
 // const TRANSITON_INTERVAL=2500;
-const NUM_CHAR=50;
-const NUM_POEM_MAX=120;
+const NUM_CHAR=40;
+const NUM_POEM_MAX=200;
 const WEATHER_COLOR="#E8FFD3";
 const POEM_COLOR="white";
 // const POEM_PADDING=60;
@@ -34,6 +34,9 @@ export default{
 			stage:'floating',
 			author:'漂浮繆斯',
 			poem_group:new THREE.Group(),
+			poem_timeline:null,
+			dummy_timeline:null,
+			dummy_material:[],
 		}
 	},
 	computed:{
@@ -73,6 +76,21 @@ export default{
 			this.renderer.setSize(container.clientWidth, container.clientHeight);
 			container.appendChild(this.renderer.domElement);
 
+			this.poem_timeline=new gsap.timeline({
+				defaults:{
+					duration:1,
+					ease:Sine.easeInOut,
+				},
+				autoRemoveChildren:true,
+			});
+			this.dummy_timeline=new gsap.timeline({
+				defaults:{
+					duration:1,
+					ease:Sine.easeInOut,
+				},
+				// repeat:-1,
+			});
+
 			this.resetChar();
 		},
 		resize:function(){
@@ -96,11 +114,16 @@ export default{
 		addWeather:function(arr,loc,date){
 
 			// TODO: end dummy text
-			for(i in this.dummy_text){
-				this.dummy_text[i].fadeOut();
-			}
+			if(this.tween_fade) this.tween_fade.kill();
+			let dummy=this.dummy_timeline;
+			this.tween_fade=gsap.to(this.dummy_material,3,{
+				opacity:0,
+				onComplete:function(){
+					dummy.pause();
+				},
+			});
 
-			
+			this.poem_timeline.clear();
 
 			let len=0;
 			for(i in arr){
@@ -120,7 +143,8 @@ export default{
 				
 			let destz=this.camera.position.z-this.destZ;
 			let poem_delay=POEM_DELAY_INTERVAL;
-			
+			//poem_delay=0;
+
 			for(var i in arr){
 				let text=arr[i].text;
 				[index,starty,lastx]=this.addLine(index,text,startx,starty,destz,WEATHER_COLOR,0,0)
@@ -149,7 +173,8 @@ export default{
 			}
 			
 			let weather_delay=POEM_DELAY_INTERVAL+MOVE_INTERVAL;
-			
+			//weather_delay=0;
+
 			let locx=maxLineWidth;
 			let locy=starty-LINE_HEIGHT;
 
@@ -172,6 +197,7 @@ export default{
 			this.poem_group.position.x=-maxLineWidth/2*scale_;
 			this.poem_group.position.y=-locy/2*scale_;
 
+			this.poem_timeline.restart();
 
 			return [poem_delay,weather_delay];
 		},
@@ -207,12 +233,14 @@ export default{
 		addChar:function(index,text,destx,desty,destz,color='white',repeat=-1,delay){
 			
 			let arr=(repeat==-1)?this.dummy_text:this.poem_text;
+			let timeline=(repeat==-1)?this.dummy_timeline:this.poem_timeline;
+
 			if(index<arr.length){ // recycle char
 				arr[index].updateChar(text,
 									destx,
 									desty,
 									destz,
-									color,repeat,delay);
+									color,repeat,delay,timeline);
 				// console.log('update char '+index);
 
 			}else{
@@ -225,14 +253,17 @@ export default{
 			
 		},
 		insertChar:function(char_,destx,desty,destz,color='white',repeat=-1,delay){
-		
+					
+			let timeline=(repeat==-1)?this.dummy_timeline:this.poem_timeline;
+
 			var pchar=new PoemChar(char_,
 							(destx!==undefined)?destx:Math.random()*this.width-this.width/2,
 							(desty!==undefined)?desty:Math.random()*this.height-this.height/2,
 							(destz!==undefined)?destz:0,
 							color,
 							repeat,
-							delay);
+							delay,
+							timeline);
 			// text.position.x=Math.random()*this.width-this.width/2;
 			// text.position.y=Math.random()*this.height-this.height/2;
 			// text.position.z=-Math.random()*100;
@@ -264,6 +295,9 @@ export default{
 			}
 
 			this.renderer.clear();
+
+			this.dummy_timeline.pause();
+			this.poem_timeline.pause();
 			// this.renderer.render(this.scene, this.camera);
 		},
 		resetChar:function(){
@@ -275,8 +309,15 @@ export default{
 				var t=this.$store.getters.getDummyChar(i+tmp);
 				// console.log(t);
 				this.dummy_text[i].drawText(t);
-				this.dummy_text[i].restart();
+				// this.dummy_text[i].restart();
 			}
+			if(this.tween_fade) this.tween_fade.kill();
+			this.tween_fade=gsap.to(this.dummy_material,3,{
+				opacity:1,
+				startAt:{opacity:0},
+			});
+			this.dummy_timeline.resume();
+
 		},
 		setStage:function(set_){
 			
@@ -295,7 +336,13 @@ export default{
 
 		this.init();
 		for(var i=0;i<NUM_CHAR;++i) this.insertChar(this.$store.getters.getDummyChar(i));
-		for(i=0;i<NUM_POEM_MAX*2;++i) this.insertChar('A',0,0,0,WEATHER_COLOR,0,0);
+		for(i=0;i<NUM_POEM_MAX;++i) this.insertChar('A',0,0,0,WEATHER_COLOR,0,0);
+
+		for(i in this.dummy_text){
+			this.dummy_material.push(this.dummy_text[i].material);
+		}
+			
+		this.dummy_timeline.play();
 
 		this.animate();
 	},

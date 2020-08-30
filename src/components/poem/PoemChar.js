@@ -1,21 +1,21 @@
-import {TweenMax,Sine} from 'gsap';
+import {TweenMax} from 'gsap';
 import * as THREE from 'three';
 
 export const MOVE_INTERVAL=2000;
 
 export const FONT_SIZE=30;
 export const LINE_HEIGHT=FONT_SIZE*1.5;
-const TEXT_WIDTH=FONT_SIZE*1.2;
+const TEXT_WIDTH=32;//FONT_SIZE*1.2;
 
 const START_Z=-2200;
 
 export default class PoemChar{
-	constructor(text,destx,desty,destz,color,repeat=-1,delay){
+	constructor(text,destx,desty,destz,color,repeat=-1,delay,timeline){
 
 		this.color=color;
 		this.createObject(text);
 		this.tween;
-		this.setDest(destx,desty,destz,repeat,delay);
+		this.setDest(destx,desty,destz,repeat,delay,timeline);
 		
 		this.repeat=repeat;
 		this.stage='floating';
@@ -65,17 +65,24 @@ export default class PoemChar{
 		
 
 	}
-	updateChar(text,destx,desty,destz,color,repeat=-1,delay){
+	updateChar(text,destx,desty,destz,color,repeat=-1,delay,timeline){
 		this.color=color;
 		this.drawText(text);
 		
-		this.setDest(destx,desty,destz,repeat,delay);
+		this.setDest(destx,desty,destz,repeat,delay,timeline);
 	}
 	atDest(){
 		return !this.tween.isActive();
 	}
-	setDest(destx,desty,destz,repeat,delay){
-
+	setDest(destx,desty,destz,repeat,delay,timeline){
+		
+		// repeat;
+		// delay;
+		// timeline;
+		// this.textObject.position.x=destx;
+		// this.textObject.position.y=desty;
+		// this.textObject.position.z=destz;
+	
 		let interval=MOVE_INTERVAL*(Math.random()*1.0+1.0);
 		if(delay===undefined) interval*Math.random()*.5;	
 	
@@ -84,37 +91,51 @@ export default class PoemChar{
 		this.textObject.position.y=desty*p;
 		this.textObject.position.z=START_Z;
 		
-		if(this.tween) this.tween.kill();
-		this.tween=TweenMax.to(this.textObject.position,interval/1000.0,{
-			x:destx,
-			y:desty,
-			z:destz,
-			overwrite:'all',
-			ease:Sine.easeInOut,
-			delay:delay/1000,
-			repeat:repeat,
-		});
-		// this.tween.stop();
-		
+		//if(this.tween) this.tween.kill();
+		// if(repeat==-1){
+		// 	this.tween=TweenMax.to(this.textObject.position,interval/1000.0,{
+		// 		x:destx,
+		// 		y:desty,
+		// 		z:destz,
+		// 		overwrite:'all',
+		// 		ease:Sine.easeInOut,
+		// 		delay:delay/1000,
+		// 		repeat:repeat,
+		// 	});
+		// }else{
+			// delay=0;
+
+			timeline.to(this.textObject.position,{
+				x:destx,
+				y:desty,
+				z:destz,
+				overwrite:'all',
+				repeat:repeat,
+				duration:interval/1000,
+			},delay/1000);
+		// }
+
 	}
 	reset(){
-		if(this.tween) this.tween.pause();
+		//if(this.tween) this.tween.pause();
 		this.textObject.position.z=START_Z;
 	}
 	restart(){
-		this.tween.restart();
+		// this.tween.restart();
 		this.fadeIn();
 	}
 	setRepeat(set_){
 		this.tween.repeat(set_);
 	}
 	fadeOut(){
-		TweenMax.to(this.material,3,{
+		if(this.tween_fade) this.tween_fade.kill();
+		this.tween_fade=TweenMax.to(this.material,3,{
 			opacity:0,
 		});
 	}
 	fadeIn(){
-		TweenMax.to(this.material,3,{
+		if(this.tween_fade) this.tween_fade.kill();
+		this.tween_fade=TweenMax.to(this.material,3,{
 			opacity:1,
 			delay:1,
 		});

@@ -184,7 +184,6 @@ export default{
 			container.appendChild(this.renderer.domElement);
 		},
 		animate:function(){
-			requestAnimationFrame(this.animate)
 			// this.mesh_ocean.rotation.x += 0.01
 			// this.mesh_ocean.rotation.y += 0.02
 
@@ -234,6 +233,9 @@ export default{
 
 
 			this.renderer.render(this.scene, this.camera);
+
+			requestAnimationFrame(this.animate);
+			
 		},
 		packSpots:function(arr,len){
 			// console.log(arr);

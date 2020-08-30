@@ -5,7 +5,11 @@ Vue.use(VueMeta);
 
 import VueAnalytics from 'vue-analytics'
 Vue.use(VueAnalytics, {
-  id: 'UA-80306203-11'
+  id: 'UA-80306203-11',
+  router,
+  autoTracking: {
+    screenview: true
+  },
 })
 
 import App from './App.vue';
